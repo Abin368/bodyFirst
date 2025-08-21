@@ -1,9 +1,12 @@
-export default function App() {
+import AppRoutes from "./routes/AppRoutes"
 
-
+const App:React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white text-3xl font-bold">
-      🚀 Tailwind v4 is workihhhdfweng!
-    </div>
+    <>
+  <AppRoutes/>
+    
+    </>
   )
 }
+
+export default App
