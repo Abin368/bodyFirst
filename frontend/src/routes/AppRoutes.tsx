@@ -1,26 +1,24 @@
+import { Routes, Route } from 'react-router-dom';
+import OwnerDashboard from '@/pages/Dashboard/ownerDashboard';
+import Login from '@/components/auth/Login';
+import OwnerLanding from '@/pages/landingPage/ownerLanding';
+import PrivateRoute from '@/components/PrivateRoute';
 
-import { Routes,Route } from 'react-router-dom'
-import LandingOwnerPage from '@/pages/LandingOwnerPage'
-import Login from '@/components/auth/Login'
-import Dashboard from '@/pages/Dashboard'
-import PrivateRoute from '@/components/PrivateRoute'
 const AppRoutes = () => {
   return (
-   <Routes>
+    <Routes>
+      <Route path='/' element={<OwnerLanding />} />
+      <Route path='/login' element={<Login />} />
 
-    <Route path='/' element={<LandingOwnerPage/>}/>
-    <Route path='/login' element={<Login/>}/>
-
-    <Route path='/dashboard' element={
+      <Route path='/dashboard' element={
         <PrivateRoute>
-            <Dashboard/>
+          <OwnerDashboard />
         </PrivateRoute>
-    }/>
+      }/>
 
-    <Route path='*' element={<Login/>}/>
-
-   </Routes>
-  )
+      <Route path='*' element={<Login />} />
+    </Routes>
+  );
 }
 
-export default AppRoutes
+export default AppRoutes;
