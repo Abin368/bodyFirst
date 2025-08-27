@@ -28,7 +28,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ role }) => {
 
       authStore.setAuth(accessToken, userRole, userId);
 
-      // Redirect based on role returned from backend
+
       switch (userRole) {
         case "owner":
           navigate("/owner/dashboard");
@@ -42,8 +42,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ role }) => {
         default:
           navigate("/");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed. Try again.");
+    }
+
+    catch (err: any) {
+      const message =
+       
+        err.response?.data?.message || 
+        err.message ||              
+        "Login failed. Try again.";
+
+      setError(message);
+
     } finally {
       setLoading(false);
     }
