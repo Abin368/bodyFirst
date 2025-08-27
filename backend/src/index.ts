@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes';
 import { connectDB } from './config/db';
 import { connectRedis } from './config/redis';
 
+
 dotenv.config();
 
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes);
 app.get('/', (req, res) => {
   res.send('Backend is running ');
 });
+
 
 
 async function startServer() {

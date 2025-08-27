@@ -1,4 +1,4 @@
-import { IUserRepository } from "./interfaces/IUserRepository";
+import { IUserRepository } from "../interfaces/IUserRepository";
 import User,{IUser} from "../models/User";
 
 export default class UserRepository implements IUserRepository {

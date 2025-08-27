@@ -1,12 +1,16 @@
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+
 import { IUser, Role } from '../models/User'
-import UserRepository from '../repositories/UserRepository'
+
 import OwnerProfileRepository from '../repositories/OwnerProfileRepository'
 import { generateAccessToken, generateRefreshToken } from '../utils/token'
-import { v4 as uuidv4 } from 'uuid'
-import { generateOtp, storeOtp, verifyOtp } from '../utils/otp'
-import crypto from 'crypto'
+import { IAuthService } from '../interfaces/IAuthService'
+import { IEmailService } from '../interfaces/IEmailService'
+import { IUserRepository } from '../interfaces/IUserRepository'
+import { sendOtpEmail } from '../utils/EmailService'
+import { ITokenService,DecodedToken } from '../interfaces/ITokenService'
+import { IOtpService } from '../interfaces/IOtpService'
+
 
 export interface Tokens {
     accessToken: string;
@@ -14,17 +18,17 @@ export interface Tokens {
 }
 
 
-export default class AuthService {
+export default class AuthService implements IAuthService {
 
-    private userRepository: UserRepository;
-    private ownerRepository: OwnerProfileRepository;
+   
 
-    constructor(userRepository: UserRepository,
-        ownerRepository: OwnerProfileRepository
-    ) {
-        this.userRepository = userRepository,
-            this.ownerRepository = ownerRepository
-    }
+ constructor(
+    private userRepository: IUserRepository,
+    private tokenService: ITokenService,
+    private otpService: IOtpService,
+    private emailService: IEmailService
+       
+    ) {}
     //---------------------------------------
 
     async requestSignup(email: string, role: Role): Promise<string> {
@@ -33,9 +37,9 @@ export default class AuthService {
             throw new Error('User already exists')
         }
 
-        const otp = generateOtp()
-        await storeOtp(email, otp)
-
+        const otp = this.otpService.generateOtp()
+        await this.otpService.storeOtp(email, otp)
+        await this.emailService.sendOtp(email,otp)
         console.log(`OTP for ${email}: ${otp}`);
         return otp;
     }
@@ -52,7 +56,7 @@ export default class AuthService {
         gymId?: string 
     ): Promise<{ accessToken: string; refreshToken: string; user: IUser }> {
 
-        const isValid = await verifyOtp(email, otp);
+        const isValid = await this.otpService.verifyOtp(email, otp);
         console.log('email from authService:', email);
         console.log('isValid:', isValid);
         if (!isValid) {
@@ -114,7 +118,33 @@ export default class AuthService {
 
     //---------------------------------
 
+   async refreshToken(token: string): Promise<{ accessToken: string; userId: string; role: Role; gymId?: string }> {
+        
+        const decodedRaw = this.tokenService.verifyRefreshToken(token);
 
+       
+        const validRoles: Role[] = ['owner', 'member', 'trainer'];
+        if (!validRoles.includes(decodedRaw.role as Role)) {
+            throw new Error('Invalid role in token');
+        }
+
+       
+        const decoded: DecodedToken = {
+            userId: decodedRaw.userId,
+            role: decodedRaw.role as Role,
+            gymId: decodedRaw.gymId
+        };
+
+       
+        const accessToken = this.tokenService.generateAccessToken(decoded);
+
+       
+        return {
+            accessToken,
+            userId: decoded.userId,
+            role: decoded.role,
+            gymId: decoded.gymId
+        };
+    }
 
 }
-
