@@ -14,7 +14,9 @@ import { IOtpService } from '../interfaces/IOtpService'
 
 export interface Tokens {
     accessToken: string;
-    refreshToken: string
+    refreshToken: string;
+    role:Role;
+    userId:string
 }
 
 
@@ -104,7 +106,7 @@ export default class AuthService implements IAuthService {
 
     //---------------------------------------
 
-    async login(email: string, password: string): Promise<Tokens> {
+    async login(email: string, password: string): Promise<Tokens & { role: Role; userId: string }> {
         const user = await this.userRepository.findByEmail(email)
         if (!user) throw new Error('Invalid credentials');
 
@@ -112,8 +114,9 @@ export default class AuthService implements IAuthService {
         if (!isMatch) throw new Error('Invalid credentials')
 
         const accessToken = generateAccessToken({ userId: user._id, role: user.role, gymId: user.gymId })
-        const refreshToken = generateRefreshToken({ userId: user._id })
-        return { accessToken, refreshToken }
+        const refreshToken = generateRefreshToken({ userId: user._id, role: user.role, gymId: user.gymId });
+
+        return { accessToken, refreshToken, role:user.role , userId:String(user._id) }
     }
 
     //---------------------------------

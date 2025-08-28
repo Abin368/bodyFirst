@@ -29,5 +29,5 @@ router.post('/signup/verify-otp', authController.verifyOtp);
 // login & refresh
 router.post('/login', authController.login);
 router.post('/refresh', authController.refreshToken);
-
+router.post('/logout',authController.logout)
 export default router;

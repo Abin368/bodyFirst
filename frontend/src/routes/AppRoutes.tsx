@@ -4,7 +4,7 @@ import TrainerDashboard from "@/pages/Dashboard/TrainerDashboard";
 import MemberDashboard from "@/pages/Dashboard/MemberDashboard";
 import { VerifyOtpPage } from "@/components/auth/verify-otp/VerifyOtpPage";
 import OwnerLanding from "@/pages/landingPage/OwnerLanding";
-
+import GuestRoute from "./GuestRoute";
 import PrivateRoute from "@/components/PrivateRoute";
 import SignupForm from "@/components/auth/signup/SignupForm";
 import LoginForm from "@/components/auth/login/LoginForm";
@@ -21,9 +21,30 @@ const AppRoutes = () => {
       <Route path="/member/signup" element={<SignupForm role="member" />} />
 
       {/* Login routes for all roles */}
-      <Route path="/owner/login" element={<LoginForm role="owner" />} />
-      <Route path="/trainer/login" element={<LoginForm role="trainer" />} />
-      <Route path="/member/login" element={<LoginForm role="member" />} />
+      <Route
+        path="/owner/login"
+        element={
+          <GuestRoute>
+            <LoginForm role="owner" />
+          </GuestRoute>
+        }
+      />
+      <Route
+        path="/trainer/login"
+        element={
+          <GuestRoute>
+            <LoginForm role="trainer" />
+          </GuestRoute>
+        }
+      />
+      <Route
+        path="/member/login"
+        element={
+          <GuestRoute>
+            <LoginForm role="member" />
+          </GuestRoute>
+        }
+      />
 
       <Route path="/verify-otp" element={<VerifyOtpPage />} />
 

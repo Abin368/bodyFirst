@@ -10,7 +10,7 @@ declare module "axios" {
 }
 
 const axiosInstance = axios.create({
-baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
 
   withCredentials: true,
 });
@@ -31,6 +31,12 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    if (originalRequest.url?.includes("/auth/refresh")) {
+      authStore.clearAuth();
+      window.location.href = "/";
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
