@@ -1,5 +1,5 @@
 import axiosInstance from "./axiosInstance";
-
+import axios from "axios";
 interface SignupRequestData {
   email: string;
   role: string;
@@ -8,36 +8,42 @@ interface SignupRequestData {
 interface SignupVerifyData {
   email: string;
   otp: string;
-  fullName: string,
-  password: string,
+  fullName: string;
+  password: string;
   role: string;
 }
+
+
 
 // Login
 export const loginUser = async (email: string, password: string) => {
   const response = await axiosInstance.post("/auth/login", { email, password });
-  return response.data;
+  return response.data; 
 };
 
-// Refresh
+
 export const refreshAccessToken = async () => {
-  const response = await axiosInstance.post("/auth/refresh");
+  const response = await axios.post(
+    "http://localhost:8000/api/auth/refresh",
+    {},
+    { withCredentials: true } 
+  );
   return response.data;
 };
 
 // Request OTP
 export const signupRequestOtp = async (data: SignupRequestData) => {
-  try {
-    const res = await axiosInstance.post('/auth/signup/request-otp', data);
-    return res.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Something went wrong');
-  }
-};
-
-
-
-export const signupVerifyOtp = async (data: SignupVerifyData) => {
-  const response = await axiosInstance.post("/auth/signup/verify-otp", data);
+  const response = await axiosInstance.post("/auth/signup/request-otp", data);
   return response.data;
 };
+
+// Verify OTP
+export const signupVerifyOtp = async (data: SignupVerifyData) => {
+  const response = await axiosInstance.post("/auth/signup/verify-otp", data);
+  return response.data; 
+};
+
+
+export const logoutUser = async()=>{
+  await axiosInstance.post('/auth/logout');
+}

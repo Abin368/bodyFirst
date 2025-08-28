@@ -36,6 +36,21 @@ app.use(express.json());
 app.use(cookieParser());
 
 
+app.use((req, res, next) => {
+  if (
+    req.path.includes("/login") ||
+    req.path.includes("/signup") ||
+    req.path.includes("/verify-otp")
+  ) {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.setHeader("Surrogate-Control", "no-store");
+  }
+  next();
+});
+
+
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {

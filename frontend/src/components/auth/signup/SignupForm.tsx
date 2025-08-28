@@ -4,7 +4,7 @@ import Header from "@/components/common/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signupRequestOtp } from "@/services/authService";
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SignupFormProps {
   role: "owner" | "trainer" | "member";
@@ -13,23 +13,16 @@ interface SignupFormProps {
 const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
   const navigate = useNavigate();
 
-
   const [fullName, setFullname] = useState("");
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
   const [rePassword, setRepassword] = useState("");
-
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (error) {
-      const timer = setTimeout(() => {
-        setError("");
-      }, 2000);
-
+      const timer = setTimeout(() => setError(""), 2000);
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -39,28 +32,22 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
     setError("");
     setLoading(true);
 
-
     // Frontend validations
     if (!fullName.trim()) {
       setError("Full name is required");
       setLoading(false);
       return;
     }
-
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError("Invalid email format");
       setLoading(false);
       return;
     }
-
-
-
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
       setLoading(false);
       return;
     }
-
     if (password !== rePassword) {
       setError("Passwords do not match");
       setLoading(false);
@@ -68,17 +55,18 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
     }
 
     try {
-
+      // Request OTP from backend
       await signupRequestOtp({ email, role });
-      navigate('/verify-otp', {
-        state: { email, fullName, password, role }
+
+      // Navigate to OTP verification page
+      navigate("/verify-otp", {
+        state: { email, fullName, password, role },
       });
     } catch (err: any) {
       setError(err.message || "OTP request failed. Try again.");
     } finally {
       setLoading(false);
     }
-
   };
 
   return (
@@ -113,7 +101,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
               onChange={(e) => setFullname(e.target.value)}
               required
             />
-
             <Input
               type="email"
               placeholder="Email"
@@ -121,8 +108,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-
-
             <Input
               type="password"
               placeholder="Password"
@@ -130,7 +115,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-
             <Input
               type="password"
               placeholder="Re-enter Password"
@@ -161,4 +145,3 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
 };
 
 export default SignupForm;
-

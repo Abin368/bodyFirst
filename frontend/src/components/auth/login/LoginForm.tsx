@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import Header from "@/components/common/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/services/authService";
 import { authStore } from "@/store/authStore";
+import { Navigate } from "react-router-dom";
 
-interface LoginFormProps {
+export interface LoginFormProps {
   role: "owner" | "trainer" | "member";
 }
 
@@ -18,41 +19,45 @@ const LoginForm: React.FC<LoginFormProps> = ({ role }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  if (authStore.isLoading) {
+    return <div>Loading...</div>; // Replace with your loading component
+  }
+
+  if (authStore.isAuthenticated) {
+    return <Navigate to={`/${authStore.role}/dashboard`} replace />;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
+      
       const { accessToken, role: userRole, userId } = await loginUser(email, password);
 
+    
       authStore.setAuth(accessToken, userRole, userId);
+      console.log('after login',authStore)
 
-
+      
       switch (userRole) {
         case "owner":
-          navigate("/owner/dashboard");
+          navigate("/owner/dashboard",{replace:true});
           break;
         case "trainer":
-          navigate("/trainer/dashboard");
+          navigate("/trainer/dashboard",{replace:true});
           break;
         case "member":
-          navigate("/member/dashboard");
+          navigate("/member/dashboard",{replace:true});
           break;
-        default:
-          navigate("/");
       }
-    }
-
-    catch (err: any) {
+    } catch (err: any) {
       const message =
-       
-        err.response?.data?.message || 
-        err.message ||              
+        err.response?.data?.message ||
+        err.message ||
         "Login failed. Try again.";
-
       setError(message);
-
     } finally {
       setLoading(false);
     }

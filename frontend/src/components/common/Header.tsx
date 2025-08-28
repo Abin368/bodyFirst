@@ -1,14 +1,15 @@
 import type React from 'react'
 import { Button } from '../ui/button'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { observer } from 'mobx-react-lite'
+import { authStore } from '@/store/authStore'
+import { logoutUser } from '@/services/authService'
 
 
-// interface HeaderProps{
-//     role : 'owner' | 'trainer' | 'member'
-// }
-const Header: React.FC = () => {
+const Header: React.FC = observer(() => {
     const location = useLocation()
 
+    const navigate = useNavigate()
     const validRoles = ["owner", "trainer", "member"] as const;
     type Role = (typeof validRoles)[number];
 
@@ -18,8 +19,20 @@ const Header: React.FC = () => {
         : null;
 
 
+    console.log(authStore.accessToken)
+    const isLoggedIn = authStore.isAuthenticated;
+    
+    const handleLogout =async() => {
 
-    let value: boolean = false
+        try{
+            await logoutUser()
+        authStore.clearAuth();
+        navigate('/',{replace:true})
+        }catch(error){
+            console.log(error)
+        }
+        
+    }
 
 
     return (
@@ -27,7 +40,7 @@ const Header: React.FC = () => {
             <h1 className='text-2xl font-bold'>BodyFirst</h1>
 
             <nav className='space-x-4'>
-                {value ? (
+                {isLoggedIn ? (
 
                     <>
 
@@ -35,7 +48,8 @@ const Header: React.FC = () => {
                             <Button className='px-3 py-1  bg-[#6187F0] cursor-pointer'>Home</Button>
                         </Link>
 
-                        <Button className='px-3 py-1  bg-white text-black hover:bg-black hover:text-white cursor-pointer'>Logout</Button>
+                        <Button className='px-3 py-1  bg-white text-black hover:bg-black hover:text-white cursor-pointer' onClick={handleLogout}>Logout</Button>
+
                     </>
                 )
                     : (
@@ -66,6 +80,6 @@ const Header: React.FC = () => {
 
         </header>
     )
-}
+});
 
 export default Header

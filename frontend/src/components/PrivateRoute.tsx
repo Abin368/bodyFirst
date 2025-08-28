@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { authStore } from "@/store/authStore";
 
@@ -7,9 +7,16 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = observer(({ children }) => {
-  if (!authStore.isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  const location = useLocation();
+
+  if (authStore.isLoading) {
+    return <div>Loading...</div>; 
   }
+
+  if (!authStore.isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
   return <>{children}</>;
 });
 
