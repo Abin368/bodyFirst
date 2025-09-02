@@ -55,15 +55,17 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
     }
 
     try {
-      // Request OTP from backend
-      await signupRequestOtp({ email, role });
 
-      // Navigate to OTP verification page
-      navigate("/verify-otp", {
-        state: { email, fullName, password, role },
-      });
+      const response = await signupRequestOtp({ email, role });
+
+      if (response.success) {
+        navigate("/verify-otp", { state: { email, fullName, password, role } });
+      } else {
+        setError(response.message);
+      }
+
     } catch (err: any) {
-      setError(err.message || "OTP request failed. Try again.");
+      setError(err.response?.data?.message || err.message || "OTP request failed. Try again.");
     } finally {
       setLoading(false);
     }

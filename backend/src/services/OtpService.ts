@@ -6,7 +6,7 @@ export default class OtpService implements IOtpService {
         return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
-    async storeOtp(email: string, otp: string, ttl = 300): Promise<void> {
+    async storeOtp(email: string, otp: string, ttl = 30): Promise<void> {
         await redisClient.set(`otp:${email}`, otp, { EX: ttl });
     }
 
@@ -20,5 +20,9 @@ export default class OtpService implements IOtpService {
             return true;
         }
         return false;
+    }
+
+    async deleteOtp(email:string,otp:string):Promise<void>{
+        await redisClient.del(`otp:${email}`)
     }
 }

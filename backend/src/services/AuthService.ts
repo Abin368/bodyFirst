@@ -7,43 +7,53 @@ import { generateAccessToken, generateRefreshToken } from '../utils/token'
 import { IAuthService } from '../interfaces/IAuthService'
 import { IEmailService } from '../interfaces/IEmailService'
 import { IUserRepository } from '../interfaces/IUserRepository'
-import { sendOtpEmail } from '../utils/EmailService'
-import { ITokenService,DecodedToken } from '../interfaces/ITokenService'
+
+import { ITokenService, DecodedToken } from '../interfaces/ITokenService'
 import { IOtpService } from '../interfaces/IOtpService'
 
 
 export interface Tokens {
     accessToken: string;
     refreshToken: string;
-    role:Role;
-    userId:string
+    role: Role;
+    userId: string
 }
 
 
 export default class AuthService implements IAuthService {
 
-   
 
- constructor(
-    private userRepository: IUserRepository,
-    private tokenService: ITokenService,
-    private otpService: IOtpService,
-    private emailService: IEmailService
-       
-    ) {}
+
+    constructor(
+        private userRepository: IUserRepository,
+        private tokenService: ITokenService,
+        private otpService: IOtpService,
+        private emailService: IEmailService
+
+    ) { }
     //---------------------------------------
 
-    async requestSignup(email: string, role: Role): Promise<string> {
+    async requestSignup(email: string, role: Role): Promise<void> {
         const existingUser = await this.userRepository.findByEmail(email)
+
         if (existingUser) {
             throw new Error('User already exists')
         }
 
         const otp = this.otpService.generateOtp()
         await this.otpService.storeOtp(email, otp)
-        await this.emailService.sendOtp(email,otp)
-        console.log(`OTP for ${email}: ${otp}`);
-        return otp;
+
+        try {
+
+            await this.emailService.sendOtp(email, otp)
+            
+        } catch (error) {
+            console.log("Email sending failed:", error);
+
+            await this.otpService.deleteOtp(email, otp)
+            throw new Error("Failed to send OTP");
+        }
+
     }
 
     //------------------------------------
@@ -55,12 +65,11 @@ export default class AuthService implements IAuthService {
         fullName: string,
         password: string,
         role: Role,
-        gymId?: string 
+        gymId?: string
     ): Promise<{ accessToken: string; refreshToken: string; user: IUser }> {
 
         const isValid = await this.otpService.verifyOtp(email, otp);
-        console.log('email from authService:', email);
-        console.log('isValid:', isValid);
+
         if (!isValid) {
             throw new Error('Invalid or expired OTP');
         }
@@ -71,7 +80,7 @@ export default class AuthService implements IAuthService {
         let user: IUser;
 
         if (role === 'owner') {
-            
+
             user = await this.userRepository.create({
                 email,
                 fullName,
@@ -79,10 +88,10 @@ export default class AuthService implements IAuthService {
                 role,
                 isVerified: true,
                 isOnboarded: false,
-                profileStep: 1, 
+                profileStep: 1,
             });
         } else {
-            
+
             if (!gymId) throw new Error('Gym must be selected for members');
 
             user = await this.userRepository.create({
@@ -116,32 +125,32 @@ export default class AuthService implements IAuthService {
         const accessToken = generateAccessToken({ userId: user._id, role: user.role, gymId: user.gymId })
         const refreshToken = generateRefreshToken({ userId: user._id, role: user.role, gymId: user.gymId });
 
-        return { accessToken, refreshToken, role:user.role , userId:String(user._id) }
+        return { accessToken, refreshToken, role: user.role, userId: String(user._id) }
     }
 
     //---------------------------------
 
-   async refreshToken(token: string): Promise<{ accessToken: string; userId: string; role: Role; gymId?: string }> {
-        
+    async refreshToken(token: string): Promise<{ accessToken: string; userId: string; role: Role; gymId?: string }> {
+
         const decodedRaw = this.tokenService.verifyRefreshToken(token);
 
-       
+
         const validRoles: Role[] = ['owner', 'member', 'trainer'];
         if (!validRoles.includes(decodedRaw.role as Role)) {
             throw new Error('Invalid role in token');
         }
 
-       
+
         const decoded: DecodedToken = {
             userId: decodedRaw.userId,
             role: decodedRaw.role as Role,
             gymId: decodedRaw.gymId
         };
 
-       
+
         const accessToken = this.tokenService.generateAccessToken(decoded);
 
-       
+
         return {
             accessToken,
             userId: decoded.userId,

@@ -34,6 +34,7 @@ export const refreshAccessToken = async () => {
 // Request OTP
 export const signupRequestOtp = async (data: SignupRequestData) => {
   const response = await axiosInstance.post("/auth/signup/request-otp", data);
+  console.log(response)
   return response.data;
 };
 

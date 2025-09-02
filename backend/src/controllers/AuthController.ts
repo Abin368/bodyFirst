@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { RequestOtpSchema, VerifyOtpSchema, LoginSchema } from "../dtos/auth.dto";
 import { DecodedToken, ITokenService } from "../interfaces/ITokenService";
 import { IAuthService } from "../interfaces/IAuthService";
+import { success } from "zod";
 
 
 
@@ -9,7 +10,7 @@ import { IAuthService } from "../interfaces/IAuthService";
 export default class AuthController {
     private authService: IAuthService;
     private tokenService: ITokenService;
-    
+
     constructor(authService: IAuthService, tokenService: ITokenService) {
         this.authService = authService;
         this.tokenService = tokenService
@@ -20,20 +21,28 @@ export default class AuthController {
         try {
             const body = RequestOtpSchema.parse(req.body)
 
-            await this.authService.requestSignup(body.email, body.role)
-            res.status(200).json({ message: 'OTP sent successfully' })
+           await this.authService.requestSignup(body.email, body.role)
+
+
+            return res.status(200).json({ success: true, message: 'OTP sent successfully' })
 
         } catch (error: any) {
-            console.error("Request OTP error:", error);
+            console.log("Controller error:", error.message);
+
             if (error.message === 'User already exists') {
-                return res.status(400).json({ message: "User already exists" });
+                return res.status(400).json({ success: false, message: "User already exists" });
             }
             if (error.name === "ZodError") {
-                return res.status(400).json({ message: error.errors });
+                return res.status(400).json({ success: false, message: error.errors });
             }
-            res.status(500).json({ message: "Internal server error" });
+            if (error.message === 'Failed to send OTP') {
+                return res.status(400).json({ success: false, message: 'Failed to send OTP. Please try again.' });
+            }
+
+            return res.status(500).json({ success: false, message: "Internal server error" });
         }
     }
+
 
     //---------------------------------------
 
@@ -67,7 +76,7 @@ export default class AuthController {
 
             res.cookie('refreshToken', tokens.refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production' ? true : false, 
+                secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             });
@@ -91,18 +100,18 @@ export default class AuthController {
     }
 
     //----------------------------------------
-     refreshToken = async (req: Request, res: Response) => {
-    const token = req.cookies.refreshToken;
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    refreshToken = async (req: Request, res: Response) => {
+        const token = req.cookies.refreshToken;
+        if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-    try {
-        const tokens = await this.authService.refreshToken(token);
-        res.status(200).json(tokens);
-    } catch (error) {
-        
-        res.status(401).json({ message: "Invalid or expired refresh token" });
-    }
-};
+        try {
+            const tokens = await this.authService.refreshToken(token);
+            res.status(200).json(tokens);
+        } catch (error) {
+
+            res.status(401).json({ message: "Invalid or expired refresh token" });
+        }
+    };
 
 
     //------------------------------------------------

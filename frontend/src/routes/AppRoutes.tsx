@@ -15,10 +15,42 @@ const AppRoutes = () => {
       {/* Common Landing Page */}
       <Route path="/owner" element={<OwnerLanding />} />
 
-      {/* Signup routes for all roles */}
-      <Route path="/owner/signup" element={<SignupForm role="owner" />} />
-      <Route path="/trainer/signup" element={<SignupForm role="trainer" />} />
-      <Route path="/member/signup" element={<SignupForm role="member" />} />
+    
+<Route
+  path="/owner/signup"
+  element={
+    <GuestRoute>
+      <SignupForm role="owner" />
+    </GuestRoute>
+  }
+/>
+<Route
+  path="/trainer/signup"
+  element={
+    <GuestRoute>
+      <SignupForm role="trainer" />
+    </GuestRoute>
+  }
+/>
+<Route
+  path="/member/signup"
+  element={
+    <GuestRoute>
+      <SignupForm role="member" />
+    </GuestRoute>
+  }
+/>
+
+{/* Verify OTP */}
+<Route
+  path="/verify-otp"
+  element={
+    <GuestRoute>
+      <VerifyOtpPage />
+    </GuestRoute>
+  }
+/>
+
 
       {/* Login routes for all roles */}
       <Route
