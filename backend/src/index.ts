@@ -1,77 +1,71 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import authRoutes from './routes/authRoutes';
-import { connectDB } from './config/db';
-import { connectRedis } from './config/redis';
+import express from 'express'
+import dotenv from 'dotenv'
+import cors from 'cors'
+import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import authRoutes from './routes/authRoutes'
+import { connectDB } from './config/db'
+import { connectRedis } from './config/redis'
 
+dotenv.config()
 
-dotenv.config();
+const app = express()
+const PORT = process.env.PORT || 8000
 
-const app = express();
-const PORT = process.env.PORT || 8000;
-
-
-app.use(helmet());
+app.use(helmet())
 app.use(
   rateLimit({
-    windowMs: 15 * 60 * 1000, 
+    windowMs: 15 * 60 * 1000,
     max: 100,
     message: 'Too many requests, please try again later.',
   })
-);
-console.log('Using FRONTEND_URL for CORS:', process.env.FRONTEND_URL);
+)
+console.log('Using FRONTEND_URL for CORS:', process.env.FRONTEND_URL)
 
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
   })
-);
+)
 
-app.use(express.json());
-app.use(cookieParser());
-
+app.use(express.json())
+app.use(cookieParser())
 
 app.use((req, res, next) => {
   if (
-    req.path.includes("/login") ||
-    req.path.includes("/signup") ||
-    req.path.includes("/verify-otp")
+    req.path.includes('/login') ||
+    req.path.includes('/signup') ||
+    req.path.includes('/verify-otp')
   ) {
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("Expires", "0");
-    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    res.setHeader('Pragma', 'no-cache')
+    res.setHeader('Expires', '0')
+    res.setHeader('Surrogate-Control', 'no-store')
   }
-  next();
-});
+  next()
+})
 
-
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
-  res.send('Backend is running ');
-});
-
-
+  res.send('Backend is running ')
+})
 
 async function startServer() {
   try {
-    await connectDB();
-    console.log('✅ MongoDB connected');
+    await connectDB()
+    console.log('✅ MongoDB connected')
 
-    await connectRedis();
-    console.log('✅ Redis connected');
+    await connectRedis()
+    console.log('✅ Redis connected')
 
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
   } catch (error) {
-    console.error('❌ Server startup failed:', error);
-    process.exit(1);
+    console.error('❌ Server startup failed:', error)
+    process.exit(1)
   }
 }
 
-startServer();
+startServer()

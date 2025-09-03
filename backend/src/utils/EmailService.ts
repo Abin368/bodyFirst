@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer'
 
 export const sendOtpEmail = async (email: string, otp: string) => {
   try {
@@ -15,7 +15,7 @@ export const sendOtpEmail = async (email: string, otp: string) => {
     await transporter.sendMail({
       from: `"BodyFirst" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: "Your OTP for Signup",
+      subject: 'Your OTP for Signup',
       html: `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
       <h2 style="color: #6187F0;">Welcome to BodyFirst!</h2>
@@ -29,10 +29,8 @@ export const sendOtpEmail = async (email: string, otp: string) => {
       </p>
     </div>
   `,
-    });
-
-  } catch (error) {
-   
-    throw new Error("Failed to send OTP");
+    })
+  } catch  {
+    throw new Error('Failed to send OTP')
   }
 }
