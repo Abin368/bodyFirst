@@ -20,6 +20,7 @@ export type VerifyOtpSchema = z.infer<typeof VerifyOtpSchema>
 export const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
+   role: z.enum(['owner', 'member', 'trainer']),
 })
 
 export type LoginSchema = z.infer<typeof LoginSchema>

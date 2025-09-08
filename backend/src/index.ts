@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
@@ -9,7 +10,7 @@ import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 
 dotenv.config()
-
+console.log("Loaded GOOGLE_CLIENT_ID in index.ts:", process.env.GOOGLE_CLIENT_ID);
 const app = express()
 const PORT = process.env.PORT || 8000
 
@@ -63,7 +64,7 @@ async function startServer() {
 
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
   } catch (error) {
-    console.error('❌ Server startup failed:', error)
+    console.error(' Server startup failed:', error)
     process.exit(1)
   }
 }

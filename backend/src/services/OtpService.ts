@@ -1,4 +1,4 @@
-import { IOtpService } from '../interfaces/IOtpService'
+import { IOtpService } from "../interfaces/otp/IOtpService"
 import { redisClient } from '../config/redis'
 
 export default class OtpService implements IOtpService {

@@ -1,20 +1,15 @@
-import AppRoutes from "./routes/AppRoutes"
-import { authStore } from "./store/authStore";
-import { useEffect } from "react";
+import AppRoutes from './routes/AppRoutes'
+import { authStore } from './store/authStore'
+import { useEffect } from 'react'
 
-const App:React.FC = () => {
-
+const App: React.FC = () => {
   useEffect(() => {
-  console.log("Initial AuthStore state:", authStore);
-}, []);
-
-
-
+    console.log('Initial AuthStore state:', authStore)
+  }, [])
 
   return (
     <>
-  <AppRoutes/>
-    
+      <AppRoutes />
     </>
   )
 }

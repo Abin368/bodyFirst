@@ -1,9 +1,11 @@
-import React from 'react'
+import Header from "@/components/common/Header"
 
 const MemberDashboard = () => {
-  return (
-    <div>MemberDashboard</div>
-  )
+ return (
+     <div>
+       <Header />
+     </div>
+   )
 }
 
 export default MemberDashboard

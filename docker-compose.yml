@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  backend:
+    image: gym-backend
+    container_name: gym-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/bodyfirst
+      NODE_ENV: production
+      REDIS_URI: redis://redis:6379
+    depends_on:
+      - mongo
+
+  frontend:
+    image: gym-frontend
+    container_name: gym-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8000
+
+  mongo:
+    image: mongo:6
+    container_name: bodyfirst-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7
+    container_name: bodyfirst-redis
+    ports:
+    - "6379:6379"
+
+volumes:
+  mongo-data:

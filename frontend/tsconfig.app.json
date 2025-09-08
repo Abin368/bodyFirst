@@ -24,11 +24,9 @@
     "noUncheckedSideEffectImports": true,
 
     /* Alias for shadcn */
-   "baseUrl": ".",
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]

@@ -1,27 +1,23 @@
 import { Router } from 'express'
+import TYPES from '../di/types'
+import container from '../di/inversify.config'
 import AuthController from '../controllers/AuthController'
-import AuthService from '../services/AuthService'
-import UserRepository from '../repositories/UserRepository'
-import TokenService from '../services/TokenService'
-import EmailService from '../services/EmailService'
-import OtpService from '../services/OtpService'
 
 const router = Router()
 
-const otpService = new OtpService()
-const emailService = new EmailService()
-const userRepository = new UserRepository()
-const tokenService = new TokenService()
 
-const authService = new AuthService(userRepository, tokenService, otpService, emailService)
-const authController = new AuthController(authService, tokenService)
+const authController = container.get<AuthController>(TYPES.AuthController)
 
 // OTP signup flow
-router.post('/signup/request-otp', authController.requestOtp)
-router.post('/signup/verify-otp', authController.verifyOtp)
+router.post('/signup/request-otp', (req, res) => authController.requestOtp(req, res))
+router.post('/signup/verify-otp', (req, res) => authController.verifyOtp(req, res))
 
-// login & refresh
-router.post('/login', authController.login)
-router.post('/refresh', authController.refreshToken)
-router.post('/logout', authController.logout)
+// Login & refresh
+router.post('/login', (req, res) => authController.login(req, res))
+router.post('/refresh', (req, res) => authController.refreshToken(req, res))
+router.post('/logout', (req, res) => authController.logout(req, res))
+
+router.post("/google", authController.googleLogin)
+
+
 export default router

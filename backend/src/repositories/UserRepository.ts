@@ -1,5 +1,6 @@
-import { IUserRepository } from '../interfaces/IUserRepository'
-import User, { IUser } from '../models/User'
+import { IUserRepository } from "../interfaces/user/IUserRepository"
+import User from '../models/User'
+import { IUser } from "../interfaces/models/IUser"
 
 export default class UserRepository implements IUserRepository {
   async create(userData: Partial<IUser>): Promise<IUser> {
@@ -21,9 +22,21 @@ export default class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<IUser | null> {
     try {
-      return await User.findById({ id })
+      return await User.findById(id)
     } catch (error) {
       throw new Error(`Error finding user by ID: ${error}`)
     }
   }
+
+
+
+async update(id: string, updateData: Partial<IUser>): Promise<IUser | null> {
+  try {
+    return await User.findByIdAndUpdate(id, updateData, { new: true }).exec()
+  } catch (error) {
+    throw new Error(`Error updating user: ${error}`)
+  }
+}
+
+
 }

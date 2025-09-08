@@ -1,4 +1,4 @@
-import { IEmailService } from '../interfaces/IEmailService'
+import { IEmailService } from "../interfaces/email/IEmailService"
 import { sendOtpEmail } from '../utils/EmailService'
 
 export default class EmailService implements IEmailService {

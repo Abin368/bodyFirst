@@ -1,85 +1,132 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "@/components/common/Header";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { signupRequestOtp } from "@/services/authService";
-import { motion, AnimatePresence } from "framer-motion";
-
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Header from '@/components/common/Header'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { signupRequestOtp } from '@/services/authService'
+import { authStore } from '@/store/authStore'
+import { motion, AnimatePresence } from 'framer-motion'
+import { googleLogin } from '@/services/authService'
+import Footer from '@/components/common/Footer'
 interface SignupFormProps {
-  role: "owner" | "trainer" | "member";
+  role: 'owner' | 'trainer' | 'member'
 }
 
 const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [fullName, setFullname] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rePassword, setRepassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [fullName, setFullname] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [rePassword, setRepassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
 
   useEffect(() => {
     if (error) {
-      const timer = setTimeout(() => setError(""), 2000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setError(''), 2000)
+      return () => clearTimeout(timer)
     }
-  }, [error]);
+  }, [error])
 
+  // --------------------------
+
+  useEffect(() => {
+    const g = (window as any).google
+    if (g) {
+      g.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse,
+      })
+      g.accounts.id.renderButton(
+        document.getElementById('googleBtn')!,
+        { theme: 'outline', size: 'large', width: '100%' }
+      )
+    }
+  }, [])
+
+  const handleGoogleResponse = async (response: any) => {
+    const idToken = response.credential
+    try {
+      const data = await googleLogin(idToken, role)
+      authStore.setAuth(data.accessToken, data.role, data.userId)
+
+      switch (data.role) {
+        case 'owner':
+          navigate('/owner/dashboard', { replace: true })
+          break
+        case 'trainer':
+          navigate('/trainer/dashboard', { replace: true })
+          break
+        case 'member':
+          navigate('/member/dashboard', { replace: true })
+          break
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Google signup failed.')
+    }
+  }
+
+  // --------------------------
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
-    // Frontend validations
     if (!fullName.trim()) {
-      setError("Full name is required");
-      setLoading(false);
-      return;
+      setError('Full name is required')
+      setLoading(false)
+      return
     }
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setError("Invalid email format");
-      setLoading(false);
-      return;
+      setError('Invalid email format')
+      setLoading(false)
+      return
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setLoading(false);
-      return;
+      setError('Password must be at least 6 characters')
+      setLoading(false)
+      return
     }
     if (password !== rePassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
+      setError('Passwords do not match')
+      setLoading(false)
+      return
     }
 
     try {
-
-      const response = await signupRequestOtp({ email, role });
-
+      const response = await signupRequestOtp({ email, role })
       if (response.success) {
-        navigate("/verify-otp", { state: { email, fullName, password, role } });
+        sessionStorage.setItem('signupRole', role)
+        navigate('/verify-otp', { state: { email, fullName, password, role } })
       } else {
-        setError(response.message);
+        setError(response.message)
       }
-
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "OTP request failed. Try again.");
+      setError(err.response?.data?.message || err.message || 'OTP request failed. Try again.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
       <Header />
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="w-full max-w-md p-8 bg-white shadow-md rounded-md">
-          <h2 className="text-2xl font-bold mb-6 text-center">
+      <div className="flex items-center justify-center min-h-screen  px-4">
+        <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-100 bg-white/90 backdrop-blur-md">
+
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 rounded-b-full"></div>
+
+          {/* Heading */}
+          <h2 className="text-3xl font-extrabold text-gray-800 mb-2 text-center">
             Signup as {role.charAt(0).toUpperCase() + role.slice(1)}
           </h2>
+          <p className="text-sm text-gray-500 mb-6 text-center">
+            Create your account to get started
+          </p>
 
+          {/* Error */}
           <AnimatePresence>
             {error && (
               <motion.p
@@ -95,55 +142,80 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               type="text"
               placeholder="Full Name"
               value={fullName}
               onChange={(e) => setFullname(e.target.value)}
-              required
+              className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+
             />
             <Input
               type="email"
-              placeholder="Email"
+              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
+              className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+
             />
             <Input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
+              className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+
             />
             <Input
               type="password"
               placeholder="Re-enter Password"
               value={rePassword}
               onChange={(e) => setRepassword(e.target.value)}
-              required
+              className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+
             />
 
             <Button
               type="submit"
-              className="w-full bg-[#6187F0] text-white py-2 rounded-xl hover:bg-blue-700 disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-600 text-white font-semibold shadow-md hover:scale-[1.02] hover:shadow-lg transition-transform duration-200 disabled:opacity-50"
               disabled={loading}
             >
               {loading ? "Signing up..." : "Signup"}
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-gray-500">
+
+          <div className="flex items-center gap-4 my-6">
+            <hr className="flex-grow border-gray-200" />
+            <span className="text-sm text-gray-400">or</span>
+            <hr className="flex-grow border-gray-200" />
+          </div>
+
+
+         <div id="googleBtn" className="mt-4 w-full"></div>
+
+          <p className="mt-5 text-center text-sm text-gray-500">
             Already have an account?{" "}
-            <a href="/login" className="text-blue-500 hover:underline">
+            <a
+              href="/login"
+              className="text-indigo-600 font-semibold hover:underline"
+            >
               Login here
+
             </a>
           </p>
-        </div>
-      </div>
-    </>
-  );
-};
 
-export default SignupForm;
+        </div>
+
+      </div>
+
+      <Footer />
+    </>
+
+  )
+}
+
+export default SignupForm
