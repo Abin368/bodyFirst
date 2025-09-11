@@ -39,4 +39,17 @@ async update(id: string, updateData: Partial<IUser>): Promise<IUser | null> {
 }
 
 
+async updatePassword(email: string, hashedPassword: string): Promise<IUser | null> {
+  try {
+    return await User.findOneAndUpdate(
+      { email },
+      { $set: { passwordHash: hashedPassword } },
+      { new: true }
+    ).exec()
+  } catch (error) {
+    throw new Error(`Error updating password: ${error}`)
+  }
+}
+
+
 }

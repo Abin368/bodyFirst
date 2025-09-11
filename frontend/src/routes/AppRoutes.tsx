@@ -9,6 +9,9 @@ import PrivateRoute from '@/components/PrivateRoute'
 import SignupForm from '@/components/auth/signup/SignupForm'
 import LoginForm from '@/components/auth/login/LoginForm'
 import GoogleSuccess from '@/components/auth/google/GoogleSuccess'
+import ForgetPassword from '@/components/auth/forget-password/ForgetPAssword'
+import { VerifyResetOtp } from '@/components/auth/verify-otp/VerifyResetOtp'
+import ResetPassword from '@/components/auth/forget-password/ResetPassword'
 const AppRoutes = () => {
   return (
     <Routes>
@@ -76,7 +79,44 @@ const AppRoutes = () => {
         }
       />
 
-      <Route path="/verify-otp" element={<VerifyOtpPage />} />
+     
+
+      <Route
+        path="/verify-otp"
+        element={
+          <GuestRoute>
+            <VerifyOtpPage />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/forget-password"
+        element={
+          <GuestRoute>
+            <ForgetPassword />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/verfy-reset-otp"
+        element={
+          <GuestRoute>
+            <VerifyResetOtp />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/reset-password"
+        element={
+          <GuestRoute>
+            <ResetPassword />
+          </GuestRoute>
+        }
+      />
+
 
       <Route
         path="/auth/success"

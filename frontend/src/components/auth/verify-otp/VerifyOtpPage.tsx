@@ -4,6 +4,7 @@ import { signupVerifyOtp, signupRequestOtp } from '@/services/authService'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/common/Header'
+import Footer from '@/components/common/Footer'
 
 interface LocationState {
   email: string
@@ -108,7 +109,7 @@ export const VerifyOtpPage: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br  px-4">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br  px-4 from-gray-100 via-indigo-50 to-purple-100">
         <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
           <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Verify OTP</h2>
           <p className="text-center text-gray-500 mb-4">
@@ -155,6 +156,8 @@ export const VerifyOtpPage: React.FC = () => {
           </Button>
         </div>
       </div>
+      <Footer/>
     </>
   )
 }
+

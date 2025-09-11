@@ -8,6 +8,7 @@ const TYPES = {
     TokenService: Symbol.for('TokenService'),
     EmailService: Symbol.for('EmailService'),
     OtpService: Symbol.for('OtpService'),
+    PasswordService: Symbol.for('PasswordService'),
 }
 
 export default TYPES

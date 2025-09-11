@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Header from '@/components/common/Header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,11 +8,9 @@ import { authStore } from '@/store/authStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import { googleLogin } from '@/services/authService'
 import Footer from '@/components/common/Footer'
-interface SignupFormProps {
-  role: 'owner' | 'trainer' | 'member'
-}
+import type { AuthFormProps } from '@/types/auth'
 
-const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
+const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
   const navigate = useNavigate()
 
   const [fullName, setFullname] = useState('')
@@ -114,7 +112,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
     <>
       <Header />
       <div className="flex items-center justify-center min-h-screen  px-4">
-        <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-100 bg-white/90 backdrop-blur-md">
+        <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border  bg-white/90 backdrop-blur-md from-gray-100 via-indigo-50 to-purple-100">
 
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 rounded-b-full"></div>
 
@@ -199,13 +197,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ role }) => {
 
           <p className="mt-5 text-center text-sm text-gray-500">
             Already have an account?{" "}
-            <a
-              href="/login"
+            <Link
+              to={`/${role}/login`}
               className="text-indigo-600 font-semibold hover:underline"
             >
               Login here
 
-            </a>
+            </Link>
           </p>
 
         </div>

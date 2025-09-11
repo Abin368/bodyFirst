@@ -8,13 +8,11 @@ import { authStore } from '@/store/authStore'
 import { observer } from 'mobx-react-lite'
 import { motion, AnimatePresence } from 'framer-motion'
 import Footer from '@/components/common/Footer'
+import type { AuthFormProps } from '@/types/auth'
+import { Link } from 'react-router-dom'
 
 
-export interface LoginFormProps {
-  role: 'owner' | 'trainer' | 'member'
-}
-
-const LoginForm: React.FC<LoginFormProps> = observer(({ role }) => {
+const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -88,12 +86,12 @@ const LoginForm: React.FC<LoginFormProps> = observer(({ role }) => {
   return (
     <>
       <Header />
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-100 bg-white/90 backdrop-blur-md">
-        
+      <div className="flex items-center justify-center min-h-screen px-4 ">
+        <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-100  bg-white/90 backdrop-blur-md">
+
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 rounded-b-full"></div>
 
-        
+
           <h2 className="text-3xl font-extrabold text-gray-800 mb-2 text-center">
             {role.charAt(0).toUpperCase() + role.slice(1)} Login
           </h2>
@@ -101,7 +99,7 @@ const LoginForm: React.FC<LoginFormProps> = observer(({ role }) => {
             Access your account securely
           </p>
 
-       
+
           <AnimatePresence>
             {error && (
               <motion.p
@@ -137,7 +135,7 @@ const LoginForm: React.FC<LoginFormProps> = observer(({ role }) => {
             />
 
             <Button
-             
+
               type="submit"
               className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-600 text-white font-semibold shadow-md hover:scale-[1.02] hover:shadow-lg transition-transform duration-200 disabled:opacity-50"
               disabled={loading}
@@ -149,12 +147,13 @@ const LoginForm: React.FC<LoginFormProps> = observer(({ role }) => {
           {/* Forgot password */}
           <p className="mt-5 text-center text-sm text-gray-500">
             Forgot password?{" "}
-            <a
-              href="/forgot-password"
+            <Link
+              to="/forget-password"
+              state={{role:role}}
               className="text-indigo-600 font-semibold hover:underline"
             >
               Reset here
-            </a>
+            </Link>
           </p>
 
           {/* Divider */}
@@ -165,11 +164,11 @@ const LoginForm: React.FC<LoginFormProps> = observer(({ role }) => {
           </div>
 
           {/* Google Login */}
-         
-         <div id="googleBtn" className="mt-4 w-full"></div>
+
+          <div id="googleBtn" className="mt-4 w-full"></div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
 
   )

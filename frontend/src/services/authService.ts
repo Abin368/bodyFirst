@@ -32,7 +32,6 @@ export const refreshAccessToken = async () => {
 // Request OTP
 export const signupRequestOtp = async (data: SignupRequestData) => {
   const response = await axiosInstance.post('/auth/signup/request-otp', data)
-  console.log(response)
   return response.data
 }
 
@@ -55,3 +54,29 @@ export const googleLogin = async (idToken: string, role: string) => {
   
   return response.data
 }
+
+
+export const forgetRequestOtp = async(email:string, role:string)=>{
+  const response= await axiosInstance.post(
+    '/auth/forget/request-otp',
+    {email,role}
+  )
+
+  console.log('response',response)
+  return response.data
+
+}
+
+export const forgetVerifyOtp = async (email: string, role: string, otp: string, resetToken: string) => {
+  const response = await axiosInstance.post('/auth/forget/verify-otp', { email, role, otp, resetToken });
+  return response.data;
+};
+
+export const resetPassword = async ( password: string, confirmPassword: string, resetToken: string) => {
+  const response = await axiosInstance.post('/auth/reset-password', {
+    password,
+    confirmPassword,
+    resetToken,
+  });
+  return response.data;
+};

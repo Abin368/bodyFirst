@@ -23,4 +23,8 @@ export interface IAuthService {
     role: Role
     userId: string
   }>
+
+  forgetOtpRequest(email:string,role:Role):Promise<{resetToken:string}>
+  verifyResetOtp(email:string,otp:string,resetToken:string):Promise<void>
+  resetPassword(resetToken:string,password:string,confimPassword:string):Promise<void>
 }

@@ -8,9 +8,10 @@ import rateLimit from 'express-rate-limit'
 import authRoutes from './routes/authRoutes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
+import { errorHandler } from './middlewares/errorHandler'
 
 dotenv.config()
-console.log("Loaded GOOGLE_CLIENT_ID in index.ts:", process.env.GOOGLE_CLIENT_ID);
+
 const app = express()
 const PORT = process.env.PORT || 8000
 
@@ -22,7 +23,7 @@ app.use(
     message: 'Too many requests, please try again later.',
   })
 )
-console.log('Using FRONTEND_URL for CORS:', process.env.FRONTEND_URL)
+
 
 app.use(
   cors({
@@ -35,24 +36,33 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use((req, res, next) => {
-  if (
-    req.path.includes('/login') ||
-    req.path.includes('/signup') ||
-    req.path.includes('/verify-otp')
-  ) {
+  const noCachePaths = [
+    '/login',
+    '/signup',
+    '/verify-otp',
+    '/forget-password',
+    '/verify-reset-otp',
+    '/reset-password',
+  ]
+
+  if (noCachePaths.some(path => req.path.includes(path))) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
     res.setHeader('Pragma', 'no-cache')
     res.setHeader('Expires', '0')
     res.setHeader('Surrogate-Control', 'no-store')
   }
+
   next()
 })
+
 
 app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
   res.send('Backend is running ')
 })
+
+app.use(errorHandler)
 
 async function startServer() {
   try {

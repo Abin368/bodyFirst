@@ -47,7 +47,8 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest)
       } catch {
         authStore.clearAuth()
-        window.location.href = '/login'
+        // window.location.href = '/login'
+        
       }
     }
 
