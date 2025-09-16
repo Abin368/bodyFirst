@@ -1,13 +1,12 @@
 import nodemailer from 'nodemailer'
-import fs from 'fs/promises';
+import fs from 'fs/promises'
 
-export const sendOtpEmail = async (email: string, otp: string, type: "signup" | "forget") => {
+export const sendOtpEmail = async (email: string, otp: string, type: 'signup' | 'forget') => {
   try {
-
     const templatePath = `src/templates/emails/${type}.html`
     let html = await fs.readFile(templatePath, 'utf-8')
 
-    html = html.replace("{{otp}}", otp)
+    html = html.replace('{{otp}}', otp)
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -22,10 +21,7 @@ export const sendOtpEmail = async (email: string, otp: string, type: "signup" | 
     await transporter.sendMail({
       from: `"BodyFirst" <${process.env.SMTP_USER}>`,
       to: email,
-      subject:
-        type === "signup"
-          ? "Your OTP for Signup"
-          : "Your OTP for Password Reset",
+      subject: type === 'signup' ? 'Your OTP for Signup' : 'Your OTP for Password Reset',
       html,
     })
   } catch {

@@ -1,4 +1,4 @@
-import { Schema, Document } from 'mongoose'
+import { Schema } from 'mongoose'
 import mongoose from 'mongoose'
 import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
 

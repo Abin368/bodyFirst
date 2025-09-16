@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { googleLogin } from '@/services/authService'
 import Footer from '@/components/common/Footer'
 import type { AuthFormProps } from '@/types/auth'
+import { isValidEmail } from '@/utils/validation'
 
 const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
   const navigate = useNavigate()
@@ -77,7 +78,7 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
       setLoading(false)
       return
     }
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
+    if (!isValidEmail(email)) {
       setError('Invalid email format')
       setLoading(false)
       return

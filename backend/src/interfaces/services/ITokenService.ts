@@ -1,4 +1,4 @@
-import { Role } from "../../types/role"
+import { Role } from '../../types/role'
 
 export interface DecodedToken {
   userId: string

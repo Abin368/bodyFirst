@@ -9,9 +9,10 @@ import PrivateRoute from '@/components/PrivateRoute'
 import SignupForm from '@/components/auth/signup/SignupForm'
 import LoginForm from '@/components/auth/login/LoginForm'
 import GoogleSuccess from '@/components/auth/google/GoogleSuccess'
-import ForgetPassword from '@/components/auth/forget-password/ForgetPAssword'
+import ForgetPassword from '@/components/auth/forget-password/ForgetPassword'
 import { VerifyResetOtp } from '@/components/auth/verify-otp/VerifyResetOtp'
 import ResetPassword from '@/components/auth/forget-password/ResetPassword'
+import NotFoundPage from '@/components/common/NotFoundPage'
 const AppRoutes = () => {
   return (
     <Routes>
@@ -128,7 +129,7 @@ const AppRoutes = () => {
       />
 
 
-      {/* Dashboards (Protected by PrivateRoute) */}
+  
       <Route
         path="/owner/dashboard"
         element={
@@ -155,7 +156,7 @@ const AppRoutes = () => {
       />
 
       {/* Fallback route */}
-      <Route path="*" element={<OwnerLanding />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

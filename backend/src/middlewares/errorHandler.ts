@@ -1,17 +1,15 @@
+import { Request, Response } from 'express'
+import { ZodError } from 'zod'
+import { AppError } from '../errors/AppError'
+import { HttpStatus } from '../enums/httpStatus'
 
-import { Request, Response, NextFunction } from 'express';
-import { ZodError } from 'zod';
-import { AppError } from '../errors/AppError';
-import { HttpStatus } from '../enums/httpStatus';
-
-export const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-
+export const errorHandler = (err: unknown, req: Request, res: Response) => {
   if (err instanceof ZodError) {
     return res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
       message: 'Validation Failed',
       errors: err.issues,
-    });
+    })
   }
 
   if (err instanceof AppError) {
@@ -19,18 +17,18 @@ export const errorHandler = (err: unknown, req: Request, res: Response, next: Ne
       success: false,
       message: err.message,
       errors: err.details ?? null,
-    });
+    })
   }
 
   if (err instanceof Error) {
     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: err.message || 'Internal Server Error',
-    });
+    })
   }
 
   return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
     success: false,
     message: 'Internal Server Error',
-  });
-};
+  })
+}

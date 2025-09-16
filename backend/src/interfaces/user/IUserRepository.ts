@@ -1,4 +1,4 @@
-import { IUser } from "../models/IUser"
+import { IUser } from '../models/IUser'
 
 export interface IUserRepository {
   create(userData: Partial<IUser>): Promise<IUser>

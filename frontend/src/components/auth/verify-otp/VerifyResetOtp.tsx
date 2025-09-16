@@ -6,16 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
+import type{ ResetOtpState } from '@/types/auth'
 
-interface LocationState {
-  email: string
-  role: 'owner' | 'member' | 'trainer'
-}
 
 export const VerifyResetOtp: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const state = location.state as LocationState | undefined
+  const state = location.state as ResetOtpState | undefined
 
   const email = state?.email || ''
   const role = state?.role || 'member'

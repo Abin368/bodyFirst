@@ -1,5 +1,5 @@
-import mongoose, { Schema } from 'mongoose';
-import { IUser } from '../interfaces/models/IUser';
+import mongoose, { Schema } from 'mongoose'
+import { IUser } from '../interfaces/models/IUser'
 
 const UserSchema: Schema<IUser> = new Schema(
   {
@@ -17,8 +17,8 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     isActive: { type: Boolean, default: true },
     imageUrl: { type: String },
-    googleId:{
-       type: String,
+    googleId: {
+      type: String,
       required: false,
     },
     email: { type: String, required: true, unique: true, lowercase: true },
@@ -30,6 +30,6 @@ const UserSchema: Schema<IUser> = new Schema(
     dob: { type: Date },
   },
   { timestamps: true }
-);
+)
 
-export default mongoose.model<IUser>('User', UserSchema);
+export default mongoose.model<IUser>('User', UserSchema)

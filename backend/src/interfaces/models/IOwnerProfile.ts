@@ -1,5 +1,4 @@
-import {  Document } from 'mongoose'
-
+import { Document } from 'mongoose'
 
 export interface IOwnerProfile extends Document {
   userId: string

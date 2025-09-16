@@ -6,7 +6,6 @@
 
 //   const redisUri = process.env.REDIS_URI;
 
- 
 //   const port = Number(process.env.REDIS_PORT) || 6379;
 //   const host = process.env.REDIS_HOST || "localhost";
 //   const username = process.env.REDIS_USERNAME;
@@ -33,7 +32,6 @@
 //     throw err;
 //   }
 // }
-
 
 //---------------------------------------
 import { createClient } from 'redis'

@@ -5,18 +5,12 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
-
-interface LocationState {
-  email: string
-  role: 'owner' | 'member' | 'trainer'
-  fullName: string
-  password: string
-}
+import type{ VerifyOtpState } from '@/types/auth'
 
 export const VerifyOtpPage: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const state = location.state as LocationState | undefined
+  const state = location.state as VerifyOtpState | undefined
 
   const email = state?.email || ''
   const role = state?.role || 'owner'

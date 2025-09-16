@@ -24,7 +24,6 @@ app.use(
   })
 )
 
-
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -45,7 +44,7 @@ app.use((req, res, next) => {
     '/reset-password',
   ]
 
-  if (noCachePaths.some(path => req.path.includes(path))) {
+  if (noCachePaths.some((path) => req.path.includes(path))) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
     res.setHeader('Pragma', 'no-cache')
     res.setHeader('Expires', '0')
@@ -54,7 +53,6 @@ app.use((req, res, next) => {
 
   next()
 })
-
 
 app.use('/api/auth', authRoutes)
 
