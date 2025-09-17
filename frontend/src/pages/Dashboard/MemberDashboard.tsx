@@ -1,8 +1,10 @@
-import React from 'react'
+import Header from '@/components/common/Header'
 
 const MemberDashboard = () => {
   return (
-    <div>MemberDashboard</div>
+    <div>
+      <Header />
+    </div>
   )
 }
 

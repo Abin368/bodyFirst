@@ -1,10 +1,9 @@
-import Header from "@/components/common/Header"
+import Header from '@/components/common/Header'
 
 const OwnerDashboard = () => {
   return (
     <div>
-      <Header/>
-        
+      <Header />
     </div>
   )
 }

@@ -1,8 +1,9 @@
-import React from 'react'
-
+import Header from '@/components/common/Header'
 const TrainerDashboard = () => {
   return (
-    <div>TrainerDashboard</div>
+    <div>
+      <Header />
+    </div>
   )
 }
 

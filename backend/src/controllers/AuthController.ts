@@ -1,136 +1,114 @@
-import { Request, Response } from "express";
-import { RequestOtpSchema, VerifyOtpSchema, LoginSchema } from "../dtos/auth.dto";
-import { DecodedToken, ITokenService } from "../interfaces/ITokenService";
-import { IAuthService } from "../interfaces/IAuthService";
-import { success } from "zod";
+import { Request, Response } from 'express'
+import {
+  RequestOtpSchema,
+  VerifyOtpSchema,
+  LoginSchema,
+  ForgetPasswordOtpSchema,
+  ForgetPasswordVerifyOtpSchema,
+  ResetPasswordSchema,
+} from '../dtos/auth.dto'
+import { ITokenService } from '../interfaces/services/ITokenService'
+import { IAuthService } from '../interfaces/services/IAuthService'
+import { injectable, inject } from 'inversify'
+import TYPES from '../di/types'
+import { IAuthController } from '../interfaces/controllers/IAuthController'
+import { HttpStatus } from '../enums/httpStatus'
+import { AppError } from '../errors/AppError'
 
+@injectable()
+export default class AuthController implements IAuthController {
+  constructor(
+    @inject(TYPES.AuthService) private readonly _authService: IAuthService,
+    @inject(TYPES.TokenService) private readonly _tokenService: ITokenService
+  ) {}
 
+  private setRefreshToken(res: Response, refreshToken: string): void {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+  }
 
+  //---------------------------------------------------------
+  requestOtp = async (req: Request, res: Response): Promise<void> => {
+    const body = RequestOtpSchema.parse(req.body)
+    await this._authService.requestSignup(body.email, body.role)
+    res.status(HttpStatus.OK).json({ success: true, message: 'OTP sent successfully' })
+  }
+  //--------------------------------------------------
+  verifyOtp = async (req: Request, res: Response): Promise<void> => {
+    const body = VerifyOtpSchema.parse(req.body)
+    const result = await this._authService.verifySignupOtp(
+      body.email,
+      body.otp,
+      body.fullName,
+      body.password,
+      body.role
+    )
+    res.status(HttpStatus.CREATED).json({ message: 'OTP verified Successfully', ...result })
+  }
+  //---------------------------------------------------
+  login = async (req: Request, res: Response): Promise<void> => {
+    const body = LoginSchema.parse(req.body)
+    const tokens = await this._authService.login(body.email, body.password, body.role)
 
-export default class AuthController {
-    private authService: IAuthService;
-    private tokenService: ITokenService;
+    this.setRefreshToken(res, tokens.refreshToken)
 
-    constructor(authService: IAuthService, tokenService: ITokenService) {
-        this.authService = authService;
-        this.tokenService = tokenService
-    }
-    //--------------------------------
+    res.status(HttpStatus.OK).json({
+      accessToken: tokens.accessToken,
+      role: tokens.role,
+      userId: tokens.userId,
+    })
+  }
+  //--------------------------------------------
+  refreshToken = async (req: Request, res: Response): Promise<void> => {
+    const token = req.cookies.refreshToken
+    if (!token) throw new AppError(HttpStatus.UNAUTHORIZED, 'Unauthorized')
+      console.log('🔄 Refresh endpoint called with token:', token)
+    const tokens = await this._authService.refreshToken(token)
+    res.status(HttpStatus.OK).json(tokens)
+  }
+  //-----------------------------------------------------
+  logout = async (req: Request, res: Response): Promise<void> => {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    })
+    res.status(HttpStatus.OK).json({ message: 'Logged out succesfully' })
+  }
+  //--------------------------------------------
+  googleLogin = async (req: Request, res: Response): Promise<void> => {
+    const { idToken, role } = req.body
+    const tokens = await this._authService.googleLogin(idToken, role)
 
-    requestOtp = async (req: Request, res: Response) => {
-        try {
-            const body = RequestOtpSchema.parse(req.body)
+    this.setRefreshToken(res, tokens.refreshToken)
 
-           await this.authService.requestSignup(body.email, body.role)
+    res.status(HttpStatus.OK).json({
+      accessToken: tokens.accessToken,
+      role: tokens.role,
+      userId: tokens.userId,
+    })
+  }
+  //------------------------------------------------------
+  forgetOtp = async (req: Request, res: Response) => {
+    const body = ForgetPasswordOtpSchema.parse(req.body)
+    const resetToken = await this._authService.forgetOtpRequest(body.email, body.role)
+    res.status(HttpStatus.OK).json({ success: true, message: 'OTP sent successfully', resetToken })
+  }
+  //------------------------------------------------------------
+  verifyForgetOtp = async (req: Request, res: Response): Promise<void> => {
+    const body = ForgetPasswordVerifyOtpSchema.parse(req.body)
+    await this._authService.verifyResetOtp(body.email, body.otp, body.resetToken)
+    res.status(HttpStatus.CREATED).json({ success: true, message: 'OTP verified successfully' })
+  }
 
-
-            return res.status(200).json({ success: true, message: 'OTP sent successfully' })
-
-        } catch (error: any) {
-            console.log("Controller error:", error.message);
-
-            if (error.message === 'User already exists') {
-                return res.status(400).json({ success: false, message: "User already exists" });
-            }
-            if (error.name === "ZodError") {
-                return res.status(400).json({ success: false, message: error.errors });
-            }
-            if (error.message === 'Failed to send OTP') {
-                return res.status(400).json({ success: false, message: 'Failed to send OTP. Please try again.' });
-            }
-
-            return res.status(500).json({ success: false, message: "Internal server error" });
-        }
-    }
-
-
-    //---------------------------------------
-
-    verifyOtp = async (req: Request, res: Response) => {
-        try {
-            const body = VerifyOtpSchema.parse(req.body)
-
-
-            const result = await this.authService.verifySignupOtp(body.email, body.otp, body.fullName, body.password, body.role)
-
-
-
-            res.status(201).json({ message: "OTP verified..", ...result });
-
-        } catch (error: any) {
-
-            if (error.name === "ZodError") {
-                return res.status(400).json({ message: error.errors });
-            }
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-
-    //---------------------------------------------
-    login = async (req: Request, res: Response) => {
-        try {
-            const body = LoginSchema.parse(req.body)
-
-            const tokens = await this.authService.login(body.email, body.password);
-
-            res.cookie('refreshToken', tokens.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production' ? true : false,
-                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-            });
-
-
-            res.status(200).json({
-                accessToken: tokens.accessToken, role: tokens.role,
-                userId: tokens.userId,
-            })
-        } catch (error: any) {
-
-            if (error.message === "Invalid credentials") {
-                return res.status(400).json({ message: "Invalid credentials" });
-            }
-
-            if (error.name === "ZodError") {
-                return res.status(400).json({ message: 'Validation Failed', details: error.errors });
-            }
-            res.status(500).json({ message: "Internal server error" });
-        }
-    }
-
-    //----------------------------------------
-    refreshToken = async (req: Request, res: Response) => {
-        const token = req.cookies.refreshToken;
-        if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-        try {
-            const tokens = await this.authService.refreshToken(token);
-            res.status(200).json(tokens);
-        } catch (error) {
-
-            res.status(401).json({ message: "Invalid or expired refresh token" });
-        }
-    };
-
-
-    //------------------------------------------------
-
-    logout = async (req: Request, res: Response) => {
-        try {
-
-            res.clearCookie('refreshToken', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: "strict",
-            })
-            return res.status(200).json({ message: 'Logged out succesfully' });
-
-        } catch (error) {
-            console.error("Logout error:", error);
-            return res.status(500).json({ message: "Internal server error" });
-        }
-
-    }
-
+  //---------------------------------------
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    const body = ResetPasswordSchema.parse(req.body)
+    await this._authService.resetPassword(body.resetToken, body.password, body.confirmPassword)
+    res.status(HttpStatus.OK).json({ success: true, message: 'Password reset successful' })
+  }
 }

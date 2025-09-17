@@ -9,11 +9,7 @@ export default tseslint.config([
   },
   {
     files: ['**/*.ts'],
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      prettier,
-    ],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended, prettier],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: globals.node,
