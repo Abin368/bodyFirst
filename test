@@ -1,225 +1,42 @@
-//authcontroller
-import { Request, Response } from "express";
-import AuthService from "../services/AuthService";
-import { generateAccessToken, verifyRefreshToken } from "../utils/token";
-import { decode } from "punycode";
-
-
-export default class AuthController {
-    private authService: AuthService;
-    constructor(authService: AuthService) {
-        this.authService = authService
-    }
-    //--------------------------------
-
-    requestOtp = async (req: Request, res: Response) => {
-        try {
-            const { email, role } = req.body;
-            
-            const otp = await this.authService.requestSignup(email, role)
-            res.status(200).json({ message: 'OTP sent successfully' })
-            
-        } catch (error: any) {
-            if (error.message === 'User already exists') {
-                return res.status(400).json({ message: "User already exists" });
-            }
-            res.status(500).json({ error: "Internal server error" });
-        }
-    }
-
-    //---------------------------------------
-
-    verifyOtp = async (req: Request, res: Response) => {
-        try {
-            const {email,otp,fullName,password,role} = req.body
-            console.log('email from authcontroller',email)
-
-            const result = await this.authService.verifySignupOtp(email, otp,fullName,password,role)
-           
-
-           
-            res.status(201).json({ message: "OTP verified.." ,...result});
-
-        } catch (err: any) {
-            res.status(400).json({ message: err.message });
-        }
-    }
-
-
-    //---------------------------------------------
-    login = async (req: Request, res: Response) => {
-        try {
-            const { email, password } = req.body
-
-            const tokens = await this.authService.login(email, password);
-
-            res.cookie('refreshToken', tokens.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
-            })
-
-            res.status(200).json({ accessToken: tokens.accessToken })
-        } catch (error: any) {
-            if (error.message === "Invalid credentials") {
-                return res.status(401).json({ error: "Invalid credentials" });
-            }
-            res.status(500).json({ error: "Internal server error" });
-        }
-    }
-
-    //----------------------------------------
-    refreshToken = async (req: Request, res: Response) => {
-        const token = req.cookies.refreshToken
-
-        if (!token) return res.status(401).json({ error: 'Unauthorized' })
-
-        try {
-            const decoded: any = verifyRefreshToken(token)
-            const newAccessToken = generateAccessToken({
-                userId: decoded.userId,
-                role: decoded.role,
-                gymId: decoded.gymId
-
-            })
-
-            res.status(200).json({ accessToken: newAccessToken })
-        } catch (error) {
-            res.status(401).json({ error: "Invalid or expired refresh token" });
-
-        }
-    }
-
-    //------------------------------------------------
-
-    
-}
-
-
-
-
-
-
-
-
-//authservices
-
-
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { IUser, Role } from '../models/User'
-import UserRepository from '../repositories/UserRepository'
-import OwnerProfileRepository from '../repositories/OwnerProfileRepository'
-import { generateAccessToken, generateRefreshToken } from '../utils/token'
-import { v4 as uuidv4 } from 'uuid'
-import { generateOtp, storeOtp, verifyOtp } from '../utils/otp'
-import crypto from 'crypto'
-import { sendOtpEmail } from '../utils/EmailService'
-
-export interface Tokens {
-    accessToken: string;
-    refreshToken: string
-}
-
-
-export default class AuthService {
-
-    private userRepository: UserRepository;
-    private ownerRepository: OwnerProfileRepository;
-
-    constructor(userRepository: UserRepository,
-        ownerRepository: OwnerProfileRepository
-    ) {
-        this.userRepository = userRepository,
-            this.ownerRepository = ownerRepository
-    }
-    //---------------------------------------
-
-    async requestSignup(email: string, role: Role): Promise<string> {
-        const existingUser = await this.userRepository.findByEmail(email)
-        if (existingUser) {
-            throw new Error('User already exists')
-        }
-
-        const otp = generateOtp()
-        await storeOtp(email, otp)
-        await sendOtpEmail(email,otp)
-        console.log(`OTP for ${email}: ${otp}`);
-        return otp;
-    }
-
-    //------------------------------------
-
-
-    async verifySignupOtp(
-        email: string,
-        otp: string,
-        fullName: string,
-        password: string,
-        role: Role,
-        gymId?: string 
-    ): Promise<{ accessToken: string; refreshToken: string; user: IUser }> {
-
-        const isValid = await verifyOtp(email, otp);
-        console.log('email from authService:', email);
-        console.log('isValid:', isValid);
-        if (!isValid) {
-            throw new Error('Invalid or expired OTP');
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
-
-        let user: IUser;
-
-        if (role === 'owner') {
-            
-            user = await this.userRepository.create({
-                email,
-                fullName,
-                passwordHash,
-                role,
-                isVerified: true,
-                isOnboarded: false,
-                profileStep: 1, 
-            });
-        } else {
-            
-            if (!gymId) throw new Error('Gym must be selected for members');
-
-            user = await this.userRepository.create({
-                email,
-                fullName,
-                passwordHash,
-                role,
-                gymId,
-                isVerified: true,
-                isOnboarded: true,
-                profileStep: 3,
-            });
-        }
-
-        const accessToken = generateAccessToken({ userId: user._id, role: user.role, gymId: user.gymId });
-        const refreshToken = generateRefreshToken({ userId: user._id });
-
-        return { accessToken, refreshToken, user };
-    }
-
-
-    //---------------------------------------
-
-    async login(email: string, password: string): Promise<Tokens> {
-        const user = await this.userRepository.findByEmail(email)
-        if (!user) throw new Error('Invalid credentials');
-
-        const isMatch = await bcrypt.compare(password, user.passwordHash)
-        if (!isMatch) throw new Error('Invalid credentials')
-
-        const accessToken = generateAccessToken({ userId: user._id, role: user.role, gymId: user.gymId })
-        const refreshToken = generateRefreshToken({ userId: user._id })
-        return { accessToken, refreshToken }
-    }
-
-    //---------------------------------
-
+{
+    "message": "Request failed with status code 401",
+    "name": "AxiosError",
+    "stack": "AxiosError: Request failed with status code 401\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=9c99fbca:1253:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=9c99fbca:1585:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=9c99fbca:2143:41)\n    at async loginUser (http://localhost:5173/src/services/authService.ts:4:20)\n    at async handleSubmit (http://localhost:5173/src/components/auth/login/LoginForm.tsx?t=1758112510132:56:55)",
+    "config": {
+        "transitional": {
+            "silentJSONParsing": true,
+            "forcedJSONParsing": true,
+            "clarifyTimeoutError": false
+        },
+        "adapter": [
+            "xhr",
+            "http",
+            "fetch"
+        ],
+        "transformRequest": [
+            null
+        ],
+        "transformResponse": [
+            null
+        ],
+        "timeout": 0,
+        "xsrfCookieName": "XSRF-TOKEN",
+        "xsrfHeaderName": "X-XSRF-TOKEN",
+        "maxContentLength": -1,
+        "maxBodyLength": -1,
+        "env": {},
+        "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/json"
+        },
+        "baseURL": "http://localhost:8000/api",
+        "withCredentials": true,
+        "method": "post",
+        "url": "/auth/login",
+        "data": "{\"email\":\"abinmathw3720@gmail.com\",\"password\":\"Sheebamathew1@2\",\"role\":\"owner\"}",
+        "allowAbsoluteUrls": true,
+        "_retry": true
+    },
+    "code": "ERR_BAD_REQUEST",
+    "status": 401
 }

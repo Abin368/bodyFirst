@@ -36,7 +36,14 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
       authStore.setAuth(accessToken, userRole, userId)
       navigate(`/${userRole}/dashboard`, { replace: true })
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Login failed. Try again.')
+      console.log('login error', err)
+     const msg =
+    err.response?.data?.message || 
+    err.response?.data?.errors?.[0]?.message || 
+    err.message || 
+    'Login failed. Try again.'
+  setError(msg)
+
     } finally {
       setLoading(false)
     }
@@ -76,7 +83,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
   return (
     <>
       <Header />
-     <div className="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
 
         <motion.div
           className="w-full max-w-md p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-100 bg-white/90 backdrop-blur-md space-y-6 sm:space-y-8"

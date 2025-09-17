@@ -1,9 +1,10 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { ZodError } from 'zod'
 import { AppError } from '../errors/AppError'
 import { HttpStatus } from '../enums/httpStatus'
 
-export const errorHandler = (err: unknown, req: Request, res: Response) => {
+export const errorHandler = (err: unknown, req: Request, res: Response,next:NextFunction) => {
+ 
   if (err instanceof ZodError) {
     return res.status(HttpStatus.BAD_REQUEST).json({
       success: false,

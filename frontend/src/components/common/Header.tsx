@@ -37,7 +37,7 @@ const Header: React.FC = observer(() => {
         navigate("/", { replace: true })
       }
     } catch (error) {
-      console.log(error)
+     
     }
   }
 

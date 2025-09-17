@@ -66,7 +66,7 @@ export default class AuthController implements IAuthController {
   refreshToken = async (req: Request, res: Response): Promise<void> => {
     const token = req.cookies.refreshToken
     if (!token) throw new AppError(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-      console.log('🔄 Refresh endpoint called with token:', token)
+     
     const tokens = await this._authService.refreshToken(token)
     res.status(HttpStatus.OK).json(tokens)
   }
