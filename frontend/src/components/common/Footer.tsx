@@ -25,7 +25,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom text */}
-      <div className="text-center text-white text-xs mt-4 pb-2">
+      <div className="text-center text-white text-xs mt-4 pb-2 mb-3">
         &copy; {new Date().getFullYear()} BodyFirst. All rights reserved.
       </div>
     </footer>

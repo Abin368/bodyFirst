@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate, Navigate, Link } from 'react-router-dom'
 import Header from '@/components/common/Header'
+import Footer from '@/components/common/Footer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { loginUser } from '@/services/authService'
 import { authStore } from '@/store/authStore'
 import { observer } from 'mobx-react-lite'
 import { motion, AnimatePresence } from 'framer-motion'
-import Footer from '@/components/common/Footer'
 import type { AuthFormProps } from '@/types/auth'
-import { Link } from 'react-router-dom'
-
 
 const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
   const navigate = useNavigate()
@@ -21,15 +19,13 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
 
   useEffect(() => {
     if (error) {
-      const timer = setTimeout(() => setError(""), 2000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setError(null), 2000)
+      return () => clearTimeout(timer)
     }
-  }, [error]);
+  }, [error])
 
   if (authStore.isLoading) return <div>Loading...</div>
-  if (authStore.isAuthenticated) {
-    return <Navigate to={`/${authStore.role}/dashboard`} replace />
-  }
+  if (authStore.isAuthenticated) return <Navigate to={`/${authStore.role}/dashboard`} replace />
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,19 +46,12 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
     try {
       const { credential } = response
       if (!credential) throw new Error('Google credential missing')
-
       await authStore.loginWithGoogle(credential, role)
 
       switch (authStore.role) {
-        case 'owner':
-          navigate('/owner/dashboard', { replace: true })
-          break
-        case 'trainer':
-          navigate('/trainer/dashboard', { replace: true })
-          break
-        case 'member':
-          navigate('/member/dashboard', { replace: true })
-          break
+        case 'owner': navigate('/owner/dashboard', { replace: true }); break
+        case 'trainer': navigate('/trainer/dashboard', { replace: true }); break
+        case 'member': navigate('/member/dashboard', { replace: true }); break
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Google login failed.')
@@ -70,7 +59,6 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
   }
 
   useEffect(() => {
-
     if (window.google) {
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -83,23 +71,28 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
     }
   }, [])
 
+  const fadeInUp = { initial: { opacity: 0, y: 15 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 10 } }
+
   return (
     <>
       <Header />
-      <div className="flex items-center justify-center min-h-screen px-4 ">
-        <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-100  bg-white/90 backdrop-blur-md">
+     <div className="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
 
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 rounded-b-full"></div>
+        <motion.div
+          className="w-full max-w-md p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-100 bg-white/90 backdrop-blur-md space-y-6 sm:space-y-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          {/* Heading */}
+          <motion.div {...fadeInUp} className="space-y-2 text-center">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
+              {role.charAt(0).toUpperCase() + role.slice(1)} Login
+            </h2>
+            <p className="text-sm sm:text-base text-gray-500">Access your account securely</p>
+          </motion.div>
 
-
-          <h2 className="text-3xl font-extrabold text-gray-800 mb-2 text-center">
-            {role.charAt(0).toUpperCase() + role.slice(1)} Login
-          </h2>
-          <p className="text-sm text-gray-500 mb-6 text-center">
-            Access your account securely
-          </p>
-
-
+          {/* Error */}
           <AnimatePresence>
             {error && (
               <motion.p
@@ -107,8 +100,8 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.5 }}
-                className="text-red-500 mb-4 text-center"
+                transition={{ duration: 0.3 }}
+                className="text-red-500 text-center text-sm sm:text-base"
               >
                 {error}
               </motion.p>
@@ -116,7 +109,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
           </AnimatePresence>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <motion.form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5" {...fadeInUp}>
             <Input
               type="email"
               value={email}
@@ -133,44 +126,36 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
               required
             />
-
             <Button
-
               type="submit"
               className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-600 text-white font-semibold shadow-md hover:scale-[1.02] hover:shadow-lg transition-transform duration-200 disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? 'Logging in...' : 'Login'}
             </Button>
-          </form>
+          </motion.form>
 
           {/* Forgot password */}
-          <p className="mt-5 text-center text-sm text-gray-500">
-            Forgot password?{" "}
-            <Link
-              to="/forget-password"
-              state={{role:role}}
-              className="text-indigo-600 font-semibold hover:underline"
-            >
+          <motion.p {...fadeInUp} className="text-center text-sm sm:text-base text-gray-500">
+            Forgot password?{' '}
+            <Link to="/forget-password" state={{ role }} className="text-indigo-600 font-semibold hover:underline">
               Reset here
             </Link>
-          </p>
+          </motion.p>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
+          <motion.div {...fadeInUp} className="flex items-center gap-3 my-4 sm:my-6">
             <hr className="flex-grow border-gray-200" />
-            <span className="text-sm text-gray-400">or</span>
+            <span className="text-xs sm:text-sm text-gray-400">or</span>
             <hr className="flex-grow border-gray-200" />
-          </div>
+          </motion.div>
 
           {/* Google Login */}
-
-          <div id="googleBtn" className="mt-4 w-full"></div>
-        </div>
+          <motion.div {...fadeInUp} id="googleBtn" className="w-full"></motion.div>
+        </motion.div>
       </div>
       <Footer />
     </>
-
   )
 })
 

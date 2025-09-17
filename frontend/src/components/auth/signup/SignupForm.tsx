@@ -112,7 +112,7 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
   return (
     <>
       <Header />
-      <div className="flex items-center justify-center min-h-screen  px-4">
+      <div className="flex items-center justify-center min-h-screen  px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
         <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border  bg-white/90 backdrop-blur-md from-gray-100 via-indigo-50 to-purple-100">
 
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 rounded-b-full"></div>

@@ -3,7 +3,6 @@ import OwnerDashboard from '@/pages/Dashboard/OwnerDashboard'
 import TrainerDashboard from '@/pages/Dashboard/TrainerDashboard'
 import MemberDashboard from '@/pages/Dashboard/MemberDashboard'
 import { VerifyOtpPage } from '@/components/auth/verify-otp/VerifyOtpPage'
-import OwnerLanding from '@/pages/landingPage/OwnerLanding'
 import GuestRoute from './GuestRoute'
 import PrivateRoute from '@/components/PrivateRoute'
 import SignupForm from '@/components/auth/signup/SignupForm'
@@ -13,11 +12,39 @@ import ForgetPassword from '@/components/auth/forget-password/ForgetPassword'
 import { VerifyResetOtp } from '@/components/auth/verify-otp/VerifyResetOtp'
 import ResetPassword from '@/components/auth/forget-password/ResetPassword'
 import NotFoundPage from '@/components/common/NotFoundPage'
+import OwnerLanding from '@/pages/landingPage/OwnerLanding'
+import MemberLanding from '@/pages/landingPage/MemberLanding'
+import TrainerLanding from '@/pages/landingPage/TrainerLanding'
 const AppRoutes = () => {
   return (
     <Routes>
       {/* Common Landing Page */}
-      <Route path="/owner" element={<OwnerLanding />} />
+    <Route
+        path="/owner/landing"
+        element={
+          <GuestRoute role='owner'>
+            <OwnerLanding role="owner" />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/member/landing"
+        element={
+          <GuestRoute role='member'>
+            <MemberLanding role="member" />
+          </GuestRoute>
+        }
+      />
+
+        <Route
+        path="/trainer/landing"
+        element={
+          <GuestRoute role='trainer'>
+            <TrainerLanding role="trainer" />
+          </GuestRoute>
+        }
+      />
 
       <Route
         path="/owner/signup"
