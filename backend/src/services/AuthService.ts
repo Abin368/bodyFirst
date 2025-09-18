@@ -174,6 +174,7 @@ export default class AuthService implements IAuthService {
         email: payload.email,
         fullName: payload.name,
         googleId: payload.sub,
+        passwordHash:'google_auth',
         role,
         isVerified: true,
         isOnboarded: true,

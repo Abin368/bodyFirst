@@ -10,15 +10,12 @@ import {
   Gift,
   Menu,
   X,
-  type LucideIcon,
+  
 } from "lucide-react";
+import type{ MenuItem } from "@/types/common";
 
 
-interface MenuItem {
-  name: string;
-  path: string;
-  icon: LucideIcon;
-}
+
 
 
 const menuItems: MenuItem[] = [
