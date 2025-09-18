@@ -1,15 +1,15 @@
 import { Container } from 'inversify'
 import TYPES from './types'
 
-import AuthController from '../controllers/AuthController'
+import AuthController from '../controllers/auth.controller'
 
-import UserRepository from '../repositories/UserRepository'
+import UserRepository from '../repositories/user.repository'
 
-import TokenService from '../services/TokenService'
-import OtpService from '../services/OtpService'
-import EmailService from '../services/EmailService'
-import AuthService from '../services/AuthService'
-import PasswordService from '../services/PasswordService'
+import TokenService from '../services/token.service'
+import OtpService from '../services/otp.service'
+import EmailService from '../services/email.service'
+import AuthService from '../services/auth.service'
+import PasswordService from '../services/password.repository'
 
 const container = new Container()
 

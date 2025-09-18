@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import TYPES from '../di/types'
 import container from '../di/inversify.config'
-import AuthController from '../controllers/AuthController'
-import { asyncHandler } from '../utils/asyncHandler'
+import AuthController from '../controllers/auth.controller'
+import { asyncHandler } from '../utils/async.handler'
 
 const router = Router()
 const authController = container.get<AuthController>(TYPES.AuthController)

@@ -10,8 +10,8 @@ import { IOtpService } from '../interfaces/otp/IOtpService'
 import TYPES from '../di/types'
 import { Tokens } from '../types/auth'
 import { OAuth2Client } from 'google-auth-library'
-import { AppError } from '../errors/AppError'
-import { HttpStatus } from '../enums/httpStatus'
+import { AppError } from '../errors/app.error'
+import { HttpStatus } from '../enums/http.status'
 import { IPasswordService } from '../interfaces/services/IPasswordService'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -24,7 +24,7 @@ export default class AuthService implements IAuthService {
     @inject(TYPES.OtpService) private _otpService: IOtpService,
     @inject(TYPES.EmailService) private _emailService: IEmailService,
     @inject(TYPES.PasswordService) private _passwordService: IPasswordService
-  ) {}
+  ) { }
 
   private generateTokens(user: IUser): Tokens & { role: Role; userId: string } {
     const accessToken = generateAccessToken({
@@ -54,7 +54,7 @@ export default class AuthService implements IAuthService {
 
     try {
       await this._emailService.sendOtp(email, otp, 'signup')
-    } catch{
+    } catch {
       await this._otpService.deleteOtp(email, otp)
       throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to send OTP')
     }
@@ -100,8 +100,16 @@ export default class AuthService implements IAuthService {
     role: Role
   ): Promise<Tokens & { role: Role; userId: string }> {
     const user = await this._userRepository.findByEmail(email)
-    if (!user || user.role !== role)
+    if (!user) {
+      console.log('i am here')
       throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+
+    }
+
+    if (user.role !== role) {
+      throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+
+    }
 
     const isMatch = await this._passwordService.compare(password, user.passwordHash)
     if (!isMatch) throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
@@ -166,6 +174,7 @@ export default class AuthService implements IAuthService {
         email: payload.email,
         fullName: payload.name,
         googleId: payload.sub,
+        passwordHash:'google_auth',
         role,
         isVerified: true,
         isOnboarded: true,
@@ -195,7 +204,7 @@ export default class AuthService implements IAuthService {
 
     try {
       await this._emailService.sendOtp(email, otp, 'forget')
-    } catch  {
+    } catch {
       await this._otpService.deleteOtp(email, otp)
       await this._otpService.deleteResetSession(resetToken)
       throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to send OTP')

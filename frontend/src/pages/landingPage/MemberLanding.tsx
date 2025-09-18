@@ -1,12 +1,12 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
-import type { AuthFormProps } from '@/types/auth'
+import React from "react"
+import { Link } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Header from "@/components/common/Header"
+import Footer from "@/components/common/Footer"
+import type { AuthFormProps } from "@/types/auth"
 
-const MemberLanding: React.FC<AuthFormProps> = () => {
+const MemberLanding:React.FC<AuthFormProps>= () => {
   return (
     <>
       <Header />
@@ -42,32 +42,16 @@ const MemberLanding: React.FC<AuthFormProps> = () => {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose BodyFirst?</h2>
             <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-              Unlock a seamless fitness experience with tools designed to help you find and thrive
-              in the perfect gym.
+              Unlock a seamless fitness experience with tools designed to help you find and thrive in the perfect gym.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                {
-                  title: 'Verified Gyms',
-                  desc: 'Access a curated network of high-quality, verified gyms for a safe and reliable experience.',
-                },
-                {
-                  title: 'Top Trainers',
-                  desc: 'Connect with certified trainers to guide you toward your fitness goals.',
-                },
-                {
-                  title: 'Flexible Memberships',
-                  desc: 'Choose plans that fit your lifestyle, from short-term to long-term options.',
-                },
-                {
-                  title: 'Track Progress',
-                  desc: 'Monitor workouts and progress with intuitive, integrated tools.',
-                },
+                { title: "Verified Gyms", desc: "Access a curated network of high-quality, verified gyms for a safe and reliable experience." },
+                { title: "Top Trainers", desc: "Connect with certified trainers to guide you toward your fitness goals." },
+                { title: "Flexible Memberships", desc: "Choose plans that fit your lifestyle, from short-term to long-term options." },
+                { title: "Track Progress", desc: "Monitor workouts and progress with intuitive, integrated tools." }
               ].map((f, i) => (
-                <Card
-                  key={i}
-                  className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                >
+                <Card key={i} className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold text-gray-900">{f.title}</CardTitle>
                   </CardHeader>
@@ -88,12 +72,15 @@ const MemberLanding: React.FC<AuthFormProps> = () => {
               <h3 className="text-xl font-bold text-gray-900 mb-4">Refine Your Search</h3>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Price Range</label>
-                <input type="range" className="w-full mt-2 accent-indigo-600" />
+                <input
+                  type="range"
+                  className="w-full mt-2 accent-indigo-600"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mt-4">Facilities</label>
                 <ul className="space-y-3 text-sm text-gray-600 mt-2">
-                  {['Swimming Pool', 'Classes', 'Personal Training', 'Sauna', 'Other'].map((f) => (
+                  {["Swimming Pool", "Classes", "Personal Training", "Sauna", "Other"].map((f) => (
                     <li key={f} className="flex items-center">
                       <input type="checkbox" className="mr-2 h-4 w-4 text-indigo-600 rounded" />
                       {f}
@@ -102,9 +89,7 @@ const MemberLanding: React.FC<AuthFormProps> = () => {
                 </ul>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mt-4">
-                  Minimum Rating
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mt-4">Minimum Rating</label>
                 <input
                   type="number"
                   placeholder="Min stars"
@@ -124,32 +109,11 @@ const MemberLanding: React.FC<AuthFormProps> = () => {
             {/* Gym Listings */}
             <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
-                {
-                  name: 'Fitness First - Downtown',
-                  rating: '4.5',
-                  reviews: '120',
-                  distance: '2 miles',
-                  desc: 'State-of-the-art equipment and a variety of group classes.',
-                },
-                {
-                  name: 'Elite Fitness Center',
-                  rating: '4.8',
-                  reviews: '250',
-                  distance: '3 miles',
-                  desc: 'Top-tier facilities with expert personal trainers.',
-                },
-                {
-                  name: 'Active Life Gym',
-                  rating: '4.2',
-                  reviews: '80',
-                  distance: '5 miles',
-                  desc: 'Welcoming vibe with diverse fitness programs.',
-                },
+                { name: "Fitness First - Downtown", rating: "4.5", reviews: "120", distance: "2 miles", desc: "State-of-the-art equipment and a variety of group classes." },
+                { name: "Elite Fitness Center", rating: "4.8", reviews: "250", distance: "3 miles", desc: "Top-tier facilities with expert personal trainers." },
+                { name: "Active Life Gym", rating: "4.2", reviews: "80", distance: "5 miles", desc: "Welcoming vibe with diverse fitness programs." }
               ].map((g, i) => (
-                <Card
-                  key={i}
-                  className="p-6 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                >
+                <Card key={i} className="p-6 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
                   <h3 className="text-lg font-bold text-gray-900">{g.name}</h3>
                   <p className="text-yellow-500 flex items-center mt-1">
                     <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -177,23 +141,11 @@ const MemberLanding: React.FC<AuthFormProps> = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {[
-                {
-                  name: 'Sarah M.',
-                  text: 'BodyFirst made finding a gym with great classes so easy and stress-free!',
-                },
-                {
-                  name: 'David L.',
-                  text: 'The flexible membership options fit perfectly with my busy schedule.',
-                },
-                {
-                  name: 'Emily R.',
-                  text: 'User-friendly platform and affordable plans made my fitness journey a breeze.',
-                },
+                { name: "Sarah M.", text: "BodyFirst made finding a gym with great classes so easy and stress-free!" },
+                { name: "David L.", text: "The flexible membership options fit perfectly with my busy schedule." },
+                { name: "Emily R.", text: "User-friendly platform and affordable plans made my fitness journey a breeze." }
               ].map((t, i) => (
-                <Card
-                  key={i}
-                  className="p-6 border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                >
+                <Card key={i} className="p-6 border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
                   <p className="italic text-gray-700 text-sm">"{t.text}"</p>
                   <p className="mt-4 font-semibold text-gray-900">{t.name}</p>
                 </Card>
@@ -211,31 +163,12 @@ const MemberLanding: React.FC<AuthFormProps> = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                {
-                  step: '1',
-                  title: 'Search & Find a Gym',
-                  desc: 'Use our powerful search tool to locate gyms by city or name.',
-                },
-                {
-                  step: '2',
-                  title: 'Check Reviews & Ratings',
-                  desc: 'Read authentic reviews and ratings from fellow members.',
-                },
-                {
-                  step: '3',
-                  title: 'Choose Membership & Pay',
-                  desc: 'Select a plan that suits you and pay securely online.',
-                },
-                {
-                  step: '4',
-                  title: 'Start Your Fitness Journey',
-                  desc: 'Access top gyms and trainers to kickstart your goals.',
-                },
+                { step: "1", title: "Search & Find a Gym", desc: "Use our powerful search tool to locate gyms by city or name." },
+                { step: "2", title: "Check Reviews & Ratings", desc: "Read authentic reviews and ratings from fellow members." },
+                { step: "3", title: "Choose Membership & Pay", desc: "Select a plan that suits you and pay securely online." },
+                { step: "4", title: "Start Your Fitness Journey", desc: "Access top gyms and trainers to kickstart your goals." }
               ].map((s, i) => (
-                <Card
-                  key={i}
-                  className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl p-6"
-                >
+                <Card key={i} className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
                     <span className="text-indigo-600">{s.step}.</span> {s.title}
                   </h3>

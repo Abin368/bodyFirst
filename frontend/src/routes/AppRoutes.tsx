@@ -19,10 +19,10 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Common Landing Page */}
-      <Route
+    <Route
         path="/owner/landing"
         element={
-          <GuestRoute role="owner">
+          <GuestRoute role='owner'>
             <OwnerLanding role="owner" />
           </GuestRoute>
         }
@@ -31,16 +31,16 @@ const AppRoutes = () => {
       <Route
         path="/member/landing"
         element={
-          <GuestRoute role="member">
+          <GuestRoute role='member'>
             <MemberLanding role="member" />
           </GuestRoute>
         }
       />
 
-      <Route
+        <Route
         path="/trainer/landing"
         element={
-          <GuestRoute role="trainer">
+          <GuestRoute role='trainer'>
             <TrainerLanding role="trainer" />
           </GuestRoute>
         }

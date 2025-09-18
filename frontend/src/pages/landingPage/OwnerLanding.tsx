@@ -1,18 +1,13 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from '@/components/ui/accordion'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
-import { motion } from 'framer-motion'
-import { Users, Dumbbell, CreditCard } from 'lucide-react'
-import type { AuthFormProps } from '@/types/auth'
+import React from "react"
+import { Link } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import Header from "@/components/common/Header"
+import Footer from "@/components/common/Footer"
+import { motion } from "framer-motion"
+import { Users, Dumbbell, CreditCard } from "lucide-react"
+import type{ AuthFormProps } from "@/types/auth"
 
 const OwnerLanding: React.FC<AuthFormProps> = () => {
   const fadeIn = {
@@ -38,8 +33,7 @@ const OwnerLanding: React.FC<AuthFormProps> = () => {
               BodyFirst
             </h1>
             <p className="text-lg sm:text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
-              All-in-One Gym Management SaaS — streamline member management, trainer coordination,
-              workouts, payments, and growth in one powerful platform.
+              All-in-One Gym Management SaaS — streamline member management, trainer coordination, workouts, payments, and growth in one powerful platform.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to={`/owner/signup`}>
@@ -63,26 +57,13 @@ const OwnerLanding: React.FC<AuthFormProps> = () => {
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Features</h2>
             <p className="text-base sm:text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-              Streamline your gym operations with our comprehensive suite of tools designed for
-              efficiency and growth.
+              Streamline your gym operations with our comprehensive suite of tools designed for efficiency and growth.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
               {[
-                {
-                  title: 'Member Management',
-                  desc: 'Effortlessly manage member profiles, track attendance, and communicate with ease.',
-                  icon: <Users className="w-6 h-6 text-indigo-600" />,
-                },
-                {
-                  title: 'Workout & Diet Builder',
-                  desc: 'Craft personalized workout plans and diet recommendations tailored to your members.',
-                  icon: <Dumbbell className="w-6 h-6 text-indigo-600" />,
-                },
-                {
-                  title: 'Billing & Payments',
-                  desc: 'Automate billing, process payments securely, and monitor revenue effortlessly.',
-                  icon: <CreditCard className="w-6 h-6 text-indigo-600" />,
-                },
+                { title: "Member Management", desc: "Effortlessly manage member profiles, track attendance, and communicate with ease.", icon: <Users className="w-6 h-6 text-indigo-600" /> },
+                { title: "Workout & Diet Builder", desc: "Craft personalized workout plans and diet recommendations tailored to your members.", icon: <Dumbbell className="w-6 h-6 text-indigo-600" /> },
+                { title: "Billing & Payments", desc: "Automate billing, process payments securely, and monitor revenue effortlessly.", icon: <CreditCard className="w-6 h-6 text-indigo-600" /> }
               ].map((f, i) => (
                 <motion.div
                   key={i}
@@ -93,9 +74,7 @@ const OwnerLanding: React.FC<AuthFormProps> = () => {
                   <Card className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
                     <CardHeader className="flex items-center gap-3">
                       {f.icon}
-                      <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900">
-                        {f.title}
-                      </CardTitle>
+                      <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900">{f.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm sm:text-base text-gray-600">{f.desc}</p>
@@ -119,9 +98,9 @@ const OwnerLanding: React.FC<AuthFormProps> = () => {
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12">How It Works</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
               {[
-                { step: '1', title: 'Sign Up as Gym Owner' },
-                { step: '2', title: 'Add Members & Trainers' },
-                { step: '3', title: 'Manage & Grow' },
+                { step: "1", title: "Sign Up as Gym Owner" },
+                { step: "2", title: "Add Members & Trainers" },
+                { step: "3", title: "Manage & Grow" }
               ].map((s, i) => (
                 <motion.div key={i} variants={fadeIn}>
                   <Card className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
@@ -149,70 +128,27 @@ const OwnerLanding: React.FC<AuthFormProps> = () => {
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12">Pricing</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
               {[
-                {
-                  title: 'Free',
-                  price: '$0 /month',
-                  features: [
-                    'Basic member management',
-                    'Limited workout templates',
-                    'Payment processing',
-                  ],
-                  cta: 'Start Free',
-                  highlight: false,
-                },
-                {
-                  title: 'Pro',
-                  price: '$49 /month',
-                  features: [
-                    'Advanced member management',
-                    'Unlimited workout templates',
-                    'Scalable pricing',
-                  ],
-                  cta: 'Start Pro',
-                  highlight: true,
-                },
-                {
-                  title: 'Enterprise',
-                  price: 'Contact Us',
-                  features: ['Custom solutions', 'Dedicated support'],
-                  cta: 'Contact Us',
-                  highlight: false,
-                },
+                { title: "Free", price: "$0 /month", features: ["Basic member management", "Limited workout templates", "Payment processing"], cta: "Start Free", highlight: false },
+                { title: "Pro", price: "$49 /month", features: ["Advanced member management", "Unlimited workout templates", "Scalable pricing"], cta: "Start Pro", highlight: true },
+                { title: "Enterprise", price: "Contact Us", features: ["Custom solutions", "Dedicated support"], cta: "Contact Us", highlight: false }
               ].map((plan, i) => (
                 <motion.div key={i} variants={fadeIn}>
-                  <Card
-                    className={`relative border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl ${plan.highlight ? 'border-2 border-indigo-600' : ''}`}
-                  >
+                  <Card className={`relative border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl ${plan.highlight ? "border-2 border-indigo-600" : ""}`}>
                     {plan.highlight && (
                       <span className="absolute -top-3 right-4 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                         Most Popular
                       </span>
                     )}
                     <CardHeader>
-                      <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">
-                        {plan.title}
-                      </CardTitle>
-                      <p className="text-lg sm:text-xl font-semibold text-indigo-600">
-                        {plan.price}
-                      </p>
+                      <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">{plan.title}</CardTitle>
+                      <p className="text-lg sm:text-xl font-semibold text-indigo-600">{plan.price}</p>
                     </CardHeader>
                     <CardContent>
                       <ul className="mb-6 space-y-2 sm:space-y-3 text-gray-700 text-left text-sm sm:text-base">
                         {plan.features.map((f, idx) => (
                           <li key={idx} className="flex items-center">
-                            <svg
-                              className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 mr-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              aria-hidden="true"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M5 13l4 4L19 7"
-                              />
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                             </svg>
                             {f}
                           </li>
@@ -240,31 +176,14 @@ const OwnerLanding: React.FC<AuthFormProps> = () => {
             viewport={{ once: true, amount: 0.2 }}
             variants={fadeIn}
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12">
-              Frequently Asked Questions
-            </h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12">Frequently Asked Questions</h2>
             <Accordion type="single" collapsible className="text-left">
               {[
-                {
-                  q: 'What is BodyFirst?',
-                  a: 'BodyFirst is an all-in-one gym management SaaS platform designed to simplify and enhance gym operations.',
-                },
-                {
-                  q: 'How does the free trial work?',
-                  a: 'Explore all features at no cost for 14 days, with no credit card required.',
-                },
-                {
-                  q: 'What payment methods do you accept?',
-                  a: 'We accept credit cards, debit cards, and UPI for seamless transactions.',
-                },
-                {
-                  q: 'Can I customize the platform?',
-                  a: 'Yes, our Pro and Enterprise plans offer extensive customization options to fit your needs.',
-                },
-                {
-                  q: 'Do you offer support?',
-                  a: 'Our dedicated support team is available 24/7 to assist you.',
-                },
+                { q: "What is BodyFirst?", a: "BodyFirst is an all-in-one gym management SaaS platform designed to simplify and enhance gym operations." },
+                { q: "How does the free trial work?", a: "Explore all features at no cost for 14 days, with no credit card required." },
+                { q: "What payment methods do you accept?", a: "We accept credit cards, debit cards, and UPI for seamless transactions." },
+                { q: "Can I customize the platform?", a: "Yes, our Pro and Enterprise plans offer extensive customization options to fit your needs." },
+                { q: "Do you offer support?", a: "Our dedicated support team is available 24/7 to assist you." }
               ].map((faq, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="border-b border-gray-200">
                   <AccordionTrigger className="text-base sm:text-lg font-semibold text-gray-900 hover:text-indigo-600">

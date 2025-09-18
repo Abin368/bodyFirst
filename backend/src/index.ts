@@ -5,10 +5,10 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
-import authRoutes from './routes/authRoutes'
+import authRoutes from './routes/auth.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
-import { errorHandler } from './middlewares/errorHandler'
+import { errorHandler } from './middlewares/error.handler'
 
 dotenv.config()
 

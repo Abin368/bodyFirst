@@ -24,7 +24,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
     }
   }, [error])
 
-  if (authStore.isLoading) return <div>Loading...</div>
+  // if (authStore.isLoading) return <div>Loading...</div>
   if (authStore.isAuthenticated) return <Navigate to={`/${authStore.role}/dashboard`} replace />
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +36,14 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
       authStore.setAuth(accessToken, userRole, userId)
       navigate(`/${userRole}/dashboard`, { replace: true })
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Login failed. Try again.')
+      console.log('login error', err)
+     const msg =
+    err.response?.data?.message || 
+    err.response?.data?.errors?.[0]?.message || 
+    err.message || 
+    'Login failed. Try again.'
+  setError(msg)
+
     } finally {
       setLoading(false)
     }
@@ -49,15 +56,9 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
       await authStore.loginWithGoogle(credential, role)
 
       switch (authStore.role) {
-        case 'owner':
-          navigate('/owner/dashboard', { replace: true })
-          break
-        case 'trainer':
-          navigate('/trainer/dashboard', { replace: true })
-          break
-        case 'member':
-          navigate('/member/dashboard', { replace: true })
-          break
+        case 'owner': navigate('/owner/dashboard', { replace: true }); break
+        case 'trainer': navigate('/trainer/dashboard', { replace: true }); break
+        case 'member': navigate('/member/dashboard', { replace: true }); break
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Google login failed.')
@@ -78,11 +79,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
     }
   }, [])
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 15 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 10 },
-  }
+  const fadeInUp = { initial: { opacity: 0, y: 15 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 10 } }
 
   return (
     <>
@@ -148,11 +145,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
           {/* Forgot password */}
           <motion.p {...fadeInUp} className="text-center text-sm sm:text-base text-gray-500">
             Forgot password?{' '}
-            <Link
-              to="/forget-password"
-              state={{ role }}
-              className="text-indigo-600 font-semibold hover:underline"
-            >
+            <Link to="/forget-password" state={{ role }} className="text-indigo-600 font-semibold hover:underline">
               Reset here
             </Link>
           </motion.p>
