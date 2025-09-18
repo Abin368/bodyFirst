@@ -1,4 +1,4 @@
-import ownerProfile from '../models/ownerProfile'
+import ownerProfile from '../models/owner.model'
 import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
 import { IOwnerProfileRepository } from '../interfaces/models/IOwnerProfileRepository'
 

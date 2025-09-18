@@ -10,8 +10,8 @@ import { IOtpService } from '../interfaces/otp/IOtpService'
 import TYPES from '../di/types'
 import { Tokens } from '../types/auth'
 import { OAuth2Client } from 'google-auth-library'
-import { AppError } from '../errors/AppError'
-import { HttpStatus } from '../enums/httpStatus'
+import { AppError } from '../errors/app.error'
+import { HttpStatus } from '../enums/http.status'
 import { IPasswordService } from '../interfaces/services/IPasswordService'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)

@@ -24,7 +24,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
     }
   }, [error])
 
-  if (authStore.isLoading) return <div>Loading...</div>
+  // if (authStore.isLoading) return <div>Loading...</div>
   if (authStore.isAuthenticated) return <Navigate to={`/${authStore.role}/dashboard`} replace />
 
   const handleSubmit = async (e: React.FormEvent) => {

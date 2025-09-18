@@ -1,9 +1,9 @@
 import { injectable } from 'inversify'
 import { IUserRepository } from '../interfaces/user/IUserRepository'
 import { IUser } from '../interfaces/models/IUser'
-import User from '../models/User'
-import { AppError } from '../errors/AppError'
-import { HttpStatus } from '../enums/httpStatus'
+import User from '../models/user.model'
+import { AppError } from '../errors/app.error'
+import { HttpStatus } from '../enums/http.status'
 
 @injectable()
 export default class UserRepository implements IUserRepository {

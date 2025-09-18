@@ -12,8 +12,8 @@ import { IAuthService } from '../interfaces/services/IAuthService'
 import { injectable, inject } from 'inversify'
 import TYPES from '../di/types'
 import { IAuthController } from '../interfaces/controllers/IAuthController'
-import { HttpStatus } from '../enums/httpStatus'
-import { AppError } from '../errors/AppError'
+import { HttpStatus } from '../enums/http.status'
+import { AppError } from '../errors/app.error'
 
 @injectable()
 export default class AuthController implements IAuthController {
