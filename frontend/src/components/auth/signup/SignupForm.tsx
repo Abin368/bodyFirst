@@ -21,7 +21,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(''), 2000)
@@ -38,10 +37,11 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleGoogleResponse,
       })
-      g.accounts.id.renderButton(
-        document.getElementById('googleBtn')!,
-        { theme: 'outline', size: 'large', width: '100%' }
-      )
+      g.accounts.id.renderButton(document.getElementById('googleBtn')!, {
+        theme: 'outline',
+        size: 'large',
+        width: '100%',
+      })
     }
   }, [])
 
@@ -114,7 +114,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
       <Header />
       <div className="flex items-center justify-center min-h-screen  px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
         <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl border  bg-white/90 backdrop-blur-md from-gray-100 via-indigo-50 to-purple-100">
-
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 rounded-b-full"></div>
 
           {/* Heading */}
@@ -141,7 +140,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
             )}
           </AnimatePresence>
 
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
@@ -150,7 +148,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
               value={fullName}
               onChange={(e) => setFullname(e.target.value)}
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-
             />
             <Input
               type="email"
@@ -158,7 +155,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-
             />
             <Input
               type="password"
@@ -166,7 +162,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-
             />
             <Input
               type="password"
@@ -174,7 +169,6 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
               value={rePassword}
               onChange={(e) => setRepassword(e.target.value)}
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-
             />
 
             <Button
@@ -182,10 +176,9 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
               className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-600 text-white font-semibold shadow-md hover:scale-[1.02] hover:shadow-lg transition-transform duration-200 disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? "Signing up..." : "Signup"}
+              {loading ? 'Signing up...' : 'Signup'}
             </Button>
           </form>
-
 
           <div className="flex items-center gap-4 my-6">
             <hr className="flex-grow border-gray-200" />
@@ -193,27 +186,19 @@ const SignupForm: React.FC<AuthFormProps> = ({ role }) => {
             <hr className="flex-grow border-gray-200" />
           </div>
 
-
-         <div id="googleBtn" className="mt-4 w-full"></div>
+          <div id="googleBtn" className="mt-4 w-full"></div>
 
           <p className="mt-5 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link
-              to={`/${role}/login`}
-              className="text-indigo-600 font-semibold hover:underline"
-            >
+            Already have an account?{' '}
+            <Link to={`/${role}/login`} className="text-indigo-600 font-semibold hover:underline">
               Login here
-
             </Link>
           </p>
-
         </div>
-
       </div>
 
       <Footer />
     </>
-
   )
 }
 

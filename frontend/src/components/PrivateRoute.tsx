@@ -11,17 +11,16 @@ const PrivateRoute: React.FC<PrivateRouteProps> = observer(({ children }) => {
 
   const pathnameRole = location.pathname.split('/')[1]
 
-
   if (authStore.isLoading) {
     return <div>Loading...</div>
   }
 
   if (!authStore.isAuthenticated) {
-    if(['owner','trainer','member'].includes(pathnameRole)){
-       return <Navigate to={`/${pathnameRole}/login`} state={{ from: location }} replace />
+    if (['owner', 'trainer', 'member'].includes(pathnameRole)) {
+      return <Navigate to={`/${pathnameRole}/login`} state={{ from: location }} replace />
     }
-   
-      return <Navigate to="/" replace/>
+
+    return <Navigate to="/" replace />
   }
 
   return <>{children}</>

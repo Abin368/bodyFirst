@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
-import type{ VerifyOtpState } from '@/types/auth'
+import type { VerifyOtpState } from '@/types/auth'
 
 export const VerifyOtpPage: React.FC = () => {
   const navigate = useNavigate()
@@ -150,8 +150,7 @@ export const VerifyOtpPage: React.FC = () => {
           </Button>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   )
 }
-

@@ -1,4 +1,3 @@
-
 export type UserRole = 'owner' | 'trainer' | 'member'
 
 export interface AuthFormProps {
@@ -16,6 +15,3 @@ export interface VerifyOtpState {
   fullName: string
   password: string
 }
-
-
-

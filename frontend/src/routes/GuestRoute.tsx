@@ -4,21 +4,18 @@ import { authStore } from '@/store/authStore'
 
 interface Props {
   children: React.ReactNode
-  role?: 'owner'| 'trainer'| 'member'
+  role?: 'owner' | 'trainer' | 'member'
 }
 
-const GuestRoute: React.FC<Props> = observer(({ children,role}) => {
-
-
+const GuestRoute: React.FC<Props> = observer(({ children, role }) => {
   if (authStore.isLoading) {
     return <div>Loading...</div>
   }
 
   if (authStore.isAuthenticated) {
-
-      if(role && authStore.role !==role){
-        return <Navigate to={`/${authStore.role}/dashboard`} replace />
-      }
+    if (role && authStore.role !== role) {
+      return <Navigate to={`/${authStore.role}/dashboard`} replace />
+    }
 
     switch (authStore.role) {
       case 'owner':

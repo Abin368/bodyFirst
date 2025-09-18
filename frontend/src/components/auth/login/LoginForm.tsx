@@ -71,10 +71,11 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleGoogleResponse,
       })
-      window.google.accounts.id.renderButton(
-        document.getElementById('googleBtn')!,
-        { theme: 'outline', size: 'large', width: '100%' }
-      )
+      window.google.accounts.id.renderButton(document.getElementById('googleBtn')!, {
+        theme: 'outline',
+        size: 'large',
+        width: '100%',
+      })
     }
   }, [])
 
@@ -84,7 +85,6 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
     <>
       <Header />
       <div className="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
-
         <motion.div
           className="w-full max-w-md p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-100 bg-white/90 backdrop-blur-md space-y-6 sm:space-y-8"
           initial={{ opacity: 0, y: 20 }}

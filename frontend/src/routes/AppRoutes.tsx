@@ -49,7 +49,7 @@ const AppRoutes = () => {
       <Route
         path="/owner/signup"
         element={
-          <GuestRoute role='owner'>
+          <GuestRoute role="owner">
             <SignupForm role="owner" />
           </GuestRoute>
         }
@@ -57,7 +57,7 @@ const AppRoutes = () => {
       <Route
         path="/trainer/signup"
         element={
-          <GuestRoute role='trainer'>
+          <GuestRoute role="trainer">
             <SignupForm role="trainer" />
           </GuestRoute>
         }
@@ -65,7 +65,7 @@ const AppRoutes = () => {
       <Route
         path="/member/signup"
         element={
-          <GuestRoute role='member'>
+          <GuestRoute role="member">
             <SignupForm role="member" />
           </GuestRoute>
         }
@@ -85,7 +85,7 @@ const AppRoutes = () => {
       <Route
         path="/owner/login"
         element={
-          <GuestRoute role='owner'>
+          <GuestRoute role="owner">
             <LoginForm role="owner" />
           </GuestRoute>
         }
@@ -93,7 +93,7 @@ const AppRoutes = () => {
       <Route
         path="/trainer/login"
         element={
-          <GuestRoute role='trainer'>
+          <GuestRoute role="trainer">
             <LoginForm role="trainer" />
           </GuestRoute>
         }
@@ -101,13 +101,11 @@ const AppRoutes = () => {
       <Route
         path="/member/login"
         element={
-          <GuestRoute role='member'>
+          <GuestRoute role="member">
             <LoginForm role="member" />
           </GuestRoute>
         }
       />
-
-     
 
       <Route
         path="/verify-otp"
@@ -145,7 +143,6 @@ const AppRoutes = () => {
         }
       />
 
-
       <Route
         path="/auth/success"
         element={
@@ -155,8 +152,6 @@ const AppRoutes = () => {
         }
       />
 
-
-  
       <Route
         path="/owner/dashboard"
         element={

@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
-import type{ ResetOtpState } from '@/types/auth'
-
+import type { ResetOtpState } from '@/types/auth'
 
 export const VerifyResetOtp: React.FC = () => {
   const navigate = useNavigate()
@@ -28,9 +27,6 @@ export const VerifyResetOtp: React.FC = () => {
 
   const searchParams = new URLSearchParams(location.search)
   const resetToken = searchParams.get('token') || ''
-
-
-
 
   useEffect(() => {
     const expiry = localStorage.getItem('forgetOtpExpiry')
@@ -75,11 +71,11 @@ export const VerifyResetOtp: React.FC = () => {
 
     setLoading(true)
     try {
-      const res = await forgetVerifyOtp(email, role, otp,resetToken)
+      const res = await forgetVerifyOtp(email, role, otp, resetToken)
       showMessage(res.message, 'success')
 
       setTimeout(() => {
-        navigate(`/reset-password?token=${resetToken}`, { state: { email, role } }) 
+        navigate(`/reset-password?token=${resetToken}`, { state: { email, role } })
       }, 1000)
     } catch (err: any) {
       showMessage(err.response?.data?.message || 'OTP verification failed', 'error')
@@ -91,7 +87,7 @@ export const VerifyResetOtp: React.FC = () => {
   const handleResend = async () => {
     setResending(true)
     try {
-      await forgetRequestOtp(email, role )
+      await forgetRequestOtp(email, role)
 
       const newExpiry = Date.now() + 30 * 1000
       localStorage.setItem('forgetOtpExpiry', newExpiry.toString())
@@ -110,9 +106,7 @@ export const VerifyResetOtp: React.FC = () => {
       <Header />
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 via-indigo-50 to-purple-100 px-4">
         <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-          <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-            Verify OTP
-          </h2>
+          <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Verify OTP</h2>
           <p className="text-center text-gray-500 mb-4">
             Enter the OTP sent to <span className="font-medium">{email}</span>
           </p>

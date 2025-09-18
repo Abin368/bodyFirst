@@ -48,7 +48,6 @@ axiosInstance.interceptors.response.use(
       } catch {
         authStore.clearAuth()
         // window.location.href = '/login'
-        
       }
     }
 

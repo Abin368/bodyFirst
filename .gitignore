@@ -9,3 +9,6 @@ backend/node_modules/
 # Build outputs
 frontend/dist/
 backend/dist/
+
+*.jar
+bfg-report
