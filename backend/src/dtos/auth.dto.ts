@@ -41,8 +41,7 @@ export const ForgetPasswordVerifyOtpSchema = z.object({
 
 export type ForgetPasswordVerifyOtpSchema = z.infer<typeof ForgetPasswordVerifyOtpSchema>
 
-export const ResetPasswordSchema = z
-  .object({
+export const ResetPasswordSchema = z.object({
     resetToken: z.string(),
     password: z.string().min(8, 'Passwords must be at least 8 characters'),
     confirmPassword: z.string(),
