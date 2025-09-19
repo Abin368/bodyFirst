@@ -1,6 +1,6 @@
-import Footer from '@/components/common/Footer';
-import Header from '@/components/common/Header';
-import TrainerSidebar from '@/components/common/TrainerSidebar';
+import Footer from '@/components/common/Footer'
+import Header from '@/components/common/Header'
+import TrainerSidebar from '@/components/common/TrainerSidebar'
 
 const TrainerDashboard = () => {
   return (
@@ -9,14 +9,12 @@ const TrainerDashboard = () => {
 
       <div className="flex">
         <TrainerSidebar />
-        <main className="flex-1 p-6 md:ml-64">
-          
-        </main>
+        <main className="flex-1 p-6 md:ml-64"></main>
       </div>
 
       <Footer />
     </>
-  );
-};
+  )
+}
 
-export default TrainerDashboard;
+export default TrainerDashboard

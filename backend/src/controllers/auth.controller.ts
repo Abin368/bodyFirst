@@ -14,15 +14,22 @@ import TYPES from '../di/types'
 import { IAuthController } from '../interfaces/controllers/IAuthController'
 import { HttpStatus } from '../enums/http.status'
 import { AppError } from '../errors/app.error'
-import { ForgetResponseOtpSchema, ForgetResponseVerifyOtpSchema, GoogleSchema, LoginResponseSchema, RequestOtpResponseSchema, ResetPasswordResponseSchema, logoutSchema } from '../dtos/auth.response.dto'
-
+import {
+  ForgetResponseOtpSchema,
+  ForgetResponseVerifyOtpSchema,
+  GoogleSchema,
+  LoginResponseSchema,
+  RequestOtpResponseSchema,
+  ResetPasswordResponseSchema,
+  logoutSchema,
+} from '../dtos/auth.response.dto'
 
 @injectable()
 export default class AuthController implements IAuthController {
   constructor(
     @inject(TYPES.AuthService) private readonly _authService: IAuthService,
     @inject(TYPES.TokenService) private readonly _tokenService: ITokenService
-  ) { }
+  ) {}
 
   private setRefreshToken(res: Response, refreshToken: string): void {
     res.cookie('refreshToken', refreshToken, {
@@ -40,7 +47,7 @@ export default class AuthController implements IAuthController {
 
     const response = RequestOtpResponseSchema.parse({
       success: true,
-      message: 'OTP sent successfully'
+      message: 'OTP sent successfully',
     })
     res.status(HttpStatus.OK).json(response)
   }
@@ -88,7 +95,7 @@ export default class AuthController implements IAuthController {
     })
 
     const response = logoutSchema.parse({
-      message: 'Logged out succesfully'
+      message: 'Logged out succesfully',
     })
 
     res.status(HttpStatus.OK).json(response)
@@ -112,7 +119,9 @@ export default class AuthController implements IAuthController {
     const body = ForgetPasswordOtpSchema.parse(req.body)
     const resetToken = await this._authService.forgetOtpRequest(body.email, body.role)
     const response = ForgetResponseOtpSchema.parse({
-      success: true, message: 'OTP sent successfully', resetToken
+      success: true,
+      message: 'OTP sent successfully',
+      resetToken,
     })
     res.status(HttpStatus.OK).json(response)
   }
@@ -122,7 +131,8 @@ export default class AuthController implements IAuthController {
     await this._authService.verifyResetOtp(body.email, body.otp, body.resetToken)
 
     const response = ForgetResponseVerifyOtpSchema.parse({
-      success: true, message: 'OTP verified successfully'
+      success: true,
+      message: 'OTP verified successfully',
     })
     res.status(HttpStatus.CREATED).json(response)
   }
@@ -133,7 +143,8 @@ export default class AuthController implements IAuthController {
     await this._authService.resetPassword(body.resetToken, body.password, body.confirmPassword)
 
     const response = ResetPasswordResponseSchema.parse({
-      success: true, message: 'Password reset successful'
+      success: true,
+      message: 'Password reset successful',
     })
     res.status(HttpStatus.OK).json(response)
   }

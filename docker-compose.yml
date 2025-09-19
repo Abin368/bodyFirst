@@ -15,6 +15,10 @@ services:
       REDIS_URI: redis://redis:6379
     depends_on:
       - mongo
+    # volumes:
+    #   - ./backend:/app
+    #   - /app/node_modules
+    command: npx nodemon src/index.ts
 
   frontend:
     image: gym-frontend
@@ -26,6 +30,9 @@ services:
       - "5173:5173"
     environment:
       VITE_API_URL: http://localhost:8000
+    # volumes:
+    #   - ./frontend:/app
+    # command: npm install && npm run dev
 
   mongo:
     image: mongo:6
@@ -39,7 +46,31 @@ services:
     image: redis:7
     container_name: bodyfirst-redis
     ports:
-    - "6379:6379"
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-data:/var/lib/grafana
 
 volumes:
   mongo-data:
+  grafana-data:

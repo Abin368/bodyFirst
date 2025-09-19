@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import express from 'express'
+import client from 'prom-client'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -14,6 +15,26 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 8000
+const register = new client.Registry()
+
+const requestsCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status'],
+})
+
+register.registerMetric(requestsCounter)
+
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    requestsCounter.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode,
+    })
+  })
+  next()
+})
 
 app.use(helmet())
 app.use(
@@ -58,6 +79,11 @@ app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
   res.send('Backend is running ')
+})
+
+app.get('/metrics', async (req, res) => {
+  res.setHeader('Content-Type', register.contentType)
+  res.end(await register.metrics())
 })
 
 app.use(errorHandler)

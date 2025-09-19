@@ -1,6 +1,6 @@
-import Footer from '@/components/common/Footer';
-import Header from '@/components/common/Header';
-import MemberSidebar from '@/components/common/MemberSidebar';
+import Footer from '@/components/common/Footer'
+import Header from '@/components/common/Header'
+import MemberSidebar from '@/components/common/MemberSidebar'
 
 const MemberDashboard = () => {
   return (
@@ -9,14 +9,12 @@ const MemberDashboard = () => {
 
       <div className="flex">
         <MemberSidebar />
-        <main className="flex-1 p-6 md:ml-64">
-          
-        </main>
+        <main className="flex-1 p-6 md:ml-64"></main>
       </div>
 
       <Footer />
     </>
-  );
-};
+  )
+}
 
-export default MemberDashboard;
+export default MemberDashboard

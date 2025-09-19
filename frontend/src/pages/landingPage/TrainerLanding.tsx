@@ -1,12 +1,12 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Header from "@/components/common/Header"
-import Footer from "@/components/common/Footer"
-import type { AuthFormProps } from "@/types/auth"
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Header from '@/components/common/Header'
+import Footer from '@/components/common/Footer'
+import type { AuthFormProps } from '@/types/auth'
 
-const TrainerLanding:React.FC<AuthFormProps> = () => {
+const TrainerLanding: React.FC<AuthFormProps> = () => {
   return (
     <>
       <Header />
@@ -19,7 +19,8 @@ const TrainerLanding:React.FC<AuthFormProps> = () => {
               Elevate Your Training Career with BodyFirst
             </h1>
             <p className="text-xl sm:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
-              Connect with clients, streamline schedules, and grow your income — all in one powerful platform.
+              Connect with clients, streamline schedules, and grow your income — all in one powerful
+              platform.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6 max-w-3xl mx-auto">
               <Link to="/trainer/signup">
@@ -52,14 +53,35 @@ const TrainerLanding:React.FC<AuthFormProps> = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {[
-                { title: "Client Management", desc: "Track client progress, goals, and training plans with ease." },
-                { title: "Scheduling", desc: "Manage and sync sessions seamlessly with an integrated calendar." },
-                { title: "Payments", desc: "Secure, automated billing ensures you get paid on time." },
-                { title: "Workout Builder", desc: "Design and assign custom workout and diet plans effortlessly." },
-                { title: "Analytics", desc: "Monitor client progress and showcase results to attract more clients." },
-                { title: "Community", desc: "Network with other trainers and share expertise to grow." }
+                {
+                  title: 'Client Management',
+                  desc: 'Track client progress, goals, and training plans with ease.',
+                },
+                {
+                  title: 'Scheduling',
+                  desc: 'Manage and sync sessions seamlessly with an integrated calendar.',
+                },
+                {
+                  title: 'Payments',
+                  desc: 'Secure, automated billing ensures you get paid on time.',
+                },
+                {
+                  title: 'Workout Builder',
+                  desc: 'Design and assign custom workout and diet plans effortlessly.',
+                },
+                {
+                  title: 'Analytics',
+                  desc: 'Monitor client progress and showcase results to attract more clients.',
+                },
+                {
+                  title: 'Community',
+                  desc: 'Network with other trainers and share expertise to grow.',
+                },
               ].map((f, i) => (
-                <Card key={i} className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                <Card
+                  key={i}
+                  className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                >
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold text-gray-900">{f.title}</CardTitle>
                   </CardHeader>
@@ -81,12 +103,31 @@ const TrainerLanding:React.FC<AuthFormProps> = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { step: "1", title: "Sign Up", desc: "Create a standout trainer profile to showcase your expertise." },
-                { step: "2", title: "Get Clients", desc: "Attract members through our platform and book sessions easily." },
-                { step: "3", title: "Train & Manage", desc: "Deliver top-notch training while managing schedules and progress." },
-                { step: "4", title: "Grow Your Income", desc: "Expand your client base and earn securely with BodyFirst." }
+                {
+                  step: '1',
+                  title: 'Sign Up',
+                  desc: 'Create a standout trainer profile to showcase your expertise.',
+                },
+                {
+                  step: '2',
+                  title: 'Get Clients',
+                  desc: 'Attract members through our platform and book sessions easily.',
+                },
+                {
+                  step: '3',
+                  title: 'Train & Manage',
+                  desc: 'Deliver top-notch training while managing schedules and progress.',
+                },
+                {
+                  step: '4',
+                  title: 'Grow Your Income',
+                  desc: 'Expand your client base and earn securely with BodyFirst.',
+                },
               ].map((s, i) => (
-                <Card key={i} className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl p-6">
+                <Card
+                  key={i}
+                  className="border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl p-6"
+                >
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
                     <span className="text-indigo-600">{s.step}.</span> {s.title}
                   </h3>
@@ -106,11 +147,23 @@ const TrainerLanding:React.FC<AuthFormProps> = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {[
-                { name: "Alex J.", text: "BodyFirst saves me hours on client management, letting me focus on training!" },
-                { name: "Priya S.", text: "The platform makes it so easy to attract new clients and track their progress." },
-                { name: "Michael T.", text: "Seamless payments mean I can focus on coaching, not chasing invoices." }
+                {
+                  name: 'Alex J.',
+                  text: 'BodyFirst saves me hours on client management, letting me focus on training!',
+                },
+                {
+                  name: 'Priya S.',
+                  text: 'The platform makes it so easy to attract new clients and track their progress.',
+                },
+                {
+                  name: 'Michael T.',
+                  text: 'Seamless payments mean I can focus on coaching, not chasing invoices.',
+                },
               ].map((t, i) => (
-                <Card key={i} className="p-6 border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                <Card
+                  key={i}
+                  className="p-6 border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                >
                   <p className="italic text-gray-700 text-sm">"{t.text}"</p>
                   <p className="mt-4 font-semibold text-gray-900">{t.name}</p>
                 </Card>
@@ -124,7 +177,8 @@ const TrainerLanding:React.FC<AuthFormProps> = () => {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-4xl font-bold mb-6">Launch Your Training Career Today</h2>
             <p className="text-lg mb-8 max-w-2xl mx-auto text-indigo-100">
-              Join BodyFirst and connect with clients ready to achieve their fitness goals with your expertise.
+              Join BodyFirst and connect with clients ready to achieve their fitness goals with your
+              expertise.
             </p>
             <Link to="/trainer/signup">
               <Button
