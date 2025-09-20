@@ -15,3 +15,16 @@ export interface VerifyOtpState {
   fullName: string
   password: string
 }
+
+export interface SignupRequestData {
+  email: string
+  role: string
+}
+
+export interface SignupVerifyData {
+  email: string
+  otp: string
+  fullName: string
+  password: string
+  role: string
+}

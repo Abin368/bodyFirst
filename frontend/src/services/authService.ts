@@ -1,18 +1,6 @@
 import axiosInstance from './axiosInstance'
 import axios from 'axios'
-
-interface SignupRequestData {
-  email: string
-  role: string
-}
-
-interface SignupVerifyData {
-  email: string
-  otp: string
-  fullName: string
-  password: string
-  role: string
-}
+import type { SignupRequestData, SignupVerifyData } from '@/types/auth'
 
 // Login
 export const loginUser = async (email: string, password: string, role: string) => {

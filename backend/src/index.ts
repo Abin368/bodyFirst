@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import authRoutes from './routes/auth.routes'
+import ownerRoutes from './routes/owner.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
@@ -36,19 +37,24 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use(helmet())
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: 'Too many requests, please try again later.',
-  })
-)
-
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
+  })
+)
+
+// app.use((req, res, next) => {
+//   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+//   next();
+// });
+
+app.use(helmet())
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    message: 'Too many requests, please try again later.',
   })
 )
 
@@ -76,6 +82,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/owner', ownerRoutes)
 
 app.get('/', (req, res) => {
   res.send('Backend is running ')
