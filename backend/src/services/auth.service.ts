@@ -4,7 +4,7 @@ import { Role } from '../types/role'
 import { generateAccessToken, generateRefreshToken } from '../utils/token'
 import { IAuthService } from '../interfaces/services/IAuthService'
 import { IEmailService } from '../interfaces/email/IEmailService'
-import { IUserRepository } from '../interfaces/user/IUserRepository'
+import { IUserRepository } from '../interfaces/repository/IUserRepository'
 import { ITokenService, DecodedToken } from '../interfaces/services/ITokenService'
 import { IOtpService } from '../interfaces/otp/IOtpService'
 import TYPES from '../di/types'
@@ -24,7 +24,7 @@ export default class AuthService implements IAuthService {
     @inject(TYPES.OtpService) private _otpService: IOtpService,
     @inject(TYPES.EmailService) private _emailService: IEmailService,
     @inject(TYPES.PasswordService) private _passwordService: IPasswordService
-  ) { }
+  ) {}
 
   private generateTokens(user: IUser): Tokens & { role: Role; userId: string } {
     const accessToken = generateAccessToken({
@@ -103,12 +103,10 @@ export default class AuthService implements IAuthService {
     if (!user) {
       console.log('i am here')
       throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
-
     }
 
     if (user.role !== role) {
       throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
-
     }
 
     const isMatch = await this._passwordService.compare(password, user.passwordHash)
@@ -174,7 +172,7 @@ export default class AuthService implements IAuthService {
         email: payload.email,
         fullName: payload.name,
         googleId: payload.sub,
-        passwordHash:'google_auth',
+        passwordHash: 'google_auth',
         role,
         isVerified: true,
         isOnboarded: true,

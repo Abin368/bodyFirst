@@ -1,23 +1,22 @@
+import { Response, NextFunction, RequestHandler } from 'express'
+import { AppError } from '../errors/app.error'
 import { verifyAccessToken } from '../utils/token'
-import { Request, Response, NextFunction } from 'express'
+import { AuthRequest } from '../interfaces/user/auth-request.interface'
+import { HttpStatus } from '../enums/http.status'
 
-export interface AuthRequest extends Request {
-  user?: any
-}
-
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authMiddleware: RequestHandler = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      throw new AppError(HttpStatus.UNAUTHORIZED, 'Unauthorized')
     }
 
     const token = authHeader.split(' ')[1]
-    const decoded = verifyAccessToken(token)
-
-    req.user = decoded
+    const decoded = verifyAccessToken(token) as { userId: string; role: string }
+    ;(req as AuthRequest).user = { id: decoded.userId, role: decoded.role }
     next()
-  } catch {
-    return res.status(401).json({ error: 'Invalid or expired token' })
+  } catch (err: any) {
+    next(new AppError(HttpStatus.UNAUTHORIZED, err?.message || 'Invalid token'))
   }
 }

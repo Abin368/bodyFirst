@@ -2,7 +2,6 @@ import { Document } from 'mongoose'
 import { Role } from '../../types/role'
 
 export interface IUser extends Document {
-  gymId: string
   fullName: string
   phone: string
   role: Role

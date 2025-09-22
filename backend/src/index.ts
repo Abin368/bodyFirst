@@ -1,11 +1,13 @@
 import 'reflect-metadata'
 import express from 'express'
+import client from 'prom-client'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import authRoutes from './routes/auth.routes'
+import ownerRoutes from './routes/owner.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
@@ -14,20 +16,45 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 8000
+const register = new client.Registry()
 
-app.use(helmet())
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: 'Too many requests, please try again later.',
+const requestsCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status'],
+})
+
+register.registerMetric(requestsCounter)
+
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    requestsCounter.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode,
+    })
   })
-)
+  next()
+})
 
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
+  })
+)
+
+// app.use((req, res, next) => {
+//   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+//   next();
+// });
+
+app.use(helmet())
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    message: 'Too many requests, please try again later.',
   })
 )
 
@@ -55,9 +82,15 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/owner', ownerRoutes)
 
 app.get('/', (req, res) => {
   res.send('Backend is running ')
+})
+
+app.get('/metrics', async (req, res) => {
+  res.setHeader('Content-Type', register.contentType)
+  res.end(await register.metrics())
 })
 
 app.use(errorHandler)

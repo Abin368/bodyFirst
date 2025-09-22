@@ -1,23 +1,23 @@
-import type React from "react"
-import { useState } from "react"
-import { Button } from "../ui/button"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { observer } from "mobx-react-lite"
-import { authStore } from "@/store/authStore"
-import { logoutUser } from "@/services/authService"
-import { Menu, X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from 'react'
+import { useState } from 'react'
+import { Button } from '../ui/button'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { observer } from 'mobx-react-lite'
+import { authStore } from '@/store/authStore'
+import { logoutUser } from '@/services/authService'
+import { Menu, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const Header: React.FC = observer(() => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
 
-  const validRoles = ["owner", "trainer", "member"] as const
+  const validRoles = ['owner', 'trainer', 'member'] as const
   type Role = (typeof validRoles)[number]
 
-  const pathnameRole = location.pathname.split("/")[1]
-  const storedRole = sessionStorage.getItem("signupRole") as Role | null
+  const pathnameRole = location.pathname.split('/')[1]
+  const storedRole = sessionStorage.getItem('signupRole') as Role | null
 
   const role: Role | null = validRoles.includes(pathnameRole as Role)
     ? (pathnameRole as Role)
@@ -34,11 +34,9 @@ const Header: React.FC = observer(() => {
       if (role) {
         navigate(`/${role}/login`, { replace: true })
       } else {
-        navigate("/", { replace: true })
+        navigate('/', { replace: true })
       }
-    } catch (error) {
-     
-    }
+    } catch (error) {}
   }
 
   const navLinks = isLoggedIn ? (
@@ -55,10 +53,10 @@ const Header: React.FC = observer(() => {
       <Link to={`/${role}/landing`} onClick={() => setMobileOpen(false)}>
         <Button className="w-full md:w-auto">Home</Button>
       </Link>
-      <Link to={role ? `/${role}/signup` : "/owner/signup"} onClick={() => setMobileOpen(false)}>
+      <Link to={role ? `/${role}/signup` : '/owner/signup'} onClick={() => setMobileOpen(false)}>
         <Button className="w-full md:w-auto">Signup</Button>
       </Link>
-      <Link to={role ? `/${role}/login` : "/owner/login"} onClick={() => setMobileOpen(false)}>
+      <Link to={role ? `/${role}/login` : '/owner/login'} onClick={() => setMobileOpen(false)}>
         <Button className="w-full md:w-auto">Login</Button>
       </Link>
       <Button className="w-full md:w-auto" onClick={() => setMobileOpen(false)}>
@@ -96,10 +94,10 @@ const Header: React.FC = observer(() => {
             {/* Sliding Drawer */}
             <motion.div
               className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 flex flex-col p-6 space-y-4"
-              initial={{ x: "100%" }}
+              initial={{ x: '100%' }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
             >
               <button className="self-end mb-6" onClick={() => setMobileOpen(false)}>
                 <X size={28} />

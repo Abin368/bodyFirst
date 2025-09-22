@@ -3,11 +3,6 @@ import { IUser } from '../interfaces/models/IUser'
 
 const UserSchema: Schema<IUser> = new Schema(
   {
-    gymId: {
-      type: String,
-      required: false,
-    },
-
     fullName: { type: String, required: true, trim: true },
     phone: { type: String, trim: true },
     role: {
@@ -21,7 +16,9 @@ const UserSchema: Schema<IUser> = new Schema(
       type: String,
       required: false,
     },
+
     email: { type: String, required: true, unique: true, lowercase: true },
+
     passwordHash: { type: String, required: true },
     gender: { type: String, enum: ['male', 'female', 'other'] },
     isVerified: { type: Boolean, default: false },

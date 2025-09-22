@@ -3,8 +3,7 @@ import { ZodError } from 'zod'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
 
-export const errorHandler = (err: unknown, req: Request, res: Response,next:NextFunction) => {
- 
+export const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ZodError) {
     return res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
