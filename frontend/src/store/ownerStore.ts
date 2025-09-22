@@ -24,6 +24,7 @@ class OwnerStore {
 
     try {
       const profile = await OwnerService.getProfile()
+      console.log('profile', profile)
 
       runInAction(() => {
         this.profile = profile
@@ -51,6 +52,16 @@ class OwnerStore {
 
   get isSubscribed(): boolean {
     return this.subscriptionStatus === 'ACTIVE'
+  }
+
+  get hasGym(): boolean {
+    return !!this.profile?.gymId
+  }
+
+  get dashboardState(): 'NO_GYM' | 'NO_SUBSCRIPTION' | 'ACTIVE' {
+    if (!this.hasGym) return 'NO_GYM'
+    if (this.hasGym && !this.isSubscribed) return 'NO_SUBSCRIPTION'
+    return 'ACTIVE'
   }
 
   updateProfile(profile: OwnerProfile) {

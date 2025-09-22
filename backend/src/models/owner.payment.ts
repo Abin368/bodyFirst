@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
-import { IOwnerPaymnt } from '../interfaces/models/IOwnerPayment'
+import { IOwnerPayment } from '../interfaces/models/IOwnerPayment'
 
-const OwnerPayentSchema = new Schema<IOwnerPaymnt>(
+const OwnerPayentSchema = new Schema<IOwnerPayment>(
   {
     ownerId: { type: Schema.Types.ObjectId, ref: 'OwnerProfile', required: true },
     razorpayOrderId: { type: String, required: true },
@@ -18,4 +18,4 @@ const OwnerPayentSchema = new Schema<IOwnerPaymnt>(
   { timestamps: true }
 )
 
-export default model<IOwnerPaymnt>('OwnerPayment', OwnerPayentSchema)
+export default model<IOwnerPayment>('OwnerPayment', OwnerPayentSchema)

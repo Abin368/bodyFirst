@@ -4,21 +4,14 @@ import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
 const OwnerProfileSchema = new Schema<IOwnerProfile>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    gymId: { type: String, required: true, unique: true },
-    gymName: { type: String, required: true, trim: true },
-
-    address: {
-      city: { type: String, required: true },
-      pincode: { type: String, required: true },
-      state: { type: String, required: true },
-      street: { type: String, required: true },
-    },
+    gymId: { type: Schema.Types.ObjectId, ref: 'OwnerGym' },
 
     contactNo: { type: String, required: true },
     website: { type: String },
 
     trainerIds: [{ type: Schema.Types.ObjectId, ref: 'Trainer' }],
     numberOfTrainers: { type: Number, default: 0 },
+
     services: [{ type: String }],
     plans: [
       {
@@ -36,7 +29,7 @@ const OwnerProfileSchema = new Schema<IOwnerProfile>(
     subscriptionStart: { type: Date },
     subscriptionExpiry: { type: Date },
     autoRenew: { type: Boolean, default: false },
-    lastPaymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
+    lastPaymentId: { type: Schema.Types.ObjectId, ref: 'OwnerPayment' },
   },
   { timestamps: true }
 )

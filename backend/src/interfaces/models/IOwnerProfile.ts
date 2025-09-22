@@ -3,14 +3,8 @@ import { Document, ObjectId } from 'mongoose'
 export interface IOwnerProfile extends Document {
   _id: ObjectId
   userId: ObjectId
-  gymId: string
-  gymName: string
-  address?: {
-    city: string
-    pincode: string
-    state: string
-    street: string
-  }
+  gymId: ObjectId
+
   contactNo: string
   website?: string
 

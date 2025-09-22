@@ -23,4 +23,5 @@ export default class OwnerController implements IOwnerController {
       data: profile,
     })
   }
+  //----------------------------------------------------
 }
