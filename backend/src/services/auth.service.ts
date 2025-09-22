@@ -30,12 +30,12 @@ export default class AuthService implements IAuthService {
     const accessToken = generateAccessToken({
       userId: user._id,
       role: user.role,
-      gymId: user.gymId,
+     
     })
     const refreshToken = generateRefreshToken({
       userId: user._id,
       role: user.role,
-      gymId: user.gymId,
+      
     })
     return { accessToken, refreshToken, role: user.role, userId: String(user._id) }
   }
