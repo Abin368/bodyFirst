@@ -132,7 +132,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              required
+              
             />
             <Input
               type="password"
@@ -140,7 +140,7 @@ const LoginForm: React.FC<AuthFormProps> = observer(({ role }) => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              required
+              
             />
             <Button
               type="submit"

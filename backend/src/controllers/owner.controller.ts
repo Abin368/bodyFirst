@@ -6,6 +6,7 @@ import { IOwnerServices } from '../interfaces/services/IOwnerServices'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
 import { IOwnerController } from '../interfaces/controllers/IOwnerController'
+import { MESSAGES } from '../enums/message.constant'
 
 @injectable()
 export default class OwnerController implements IOwnerController {
@@ -14,12 +15,12 @@ export default class OwnerController implements IOwnerController {
   getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id
 
-    if (!userId) throw new AppError(HttpStatus.UNAUTHORIZED, 'Unauthorized')
+    if (!userId) throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.UNAUTHORIZED)
 
     const profile = await this._ownerService.getProfileByUserId(userId)
 
     res.status(HttpStatus.OK).json({
-      message: 'Owner profile fetched successfully',
+      message: MESSAGES.OWNER.PROFILE_FETCHED_SUCCESS,
       data: profile,
     })
   }

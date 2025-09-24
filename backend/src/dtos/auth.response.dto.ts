@@ -1,6 +1,4 @@
-import z, { success } from 'zod'
-import { Role } from '../types/role'
-import { IUser } from '../interfaces/models/IUser'
+import z from 'zod'
 
 export const RequestOtpResponseSchema = z.object({
   success: z.boolean(),

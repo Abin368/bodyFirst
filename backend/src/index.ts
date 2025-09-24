@@ -11,6 +11,8 @@ import ownerRoutes from './routes/owner.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
+import morgan from 'morgan'
+import logger from './utils/logger'
 
 dotenv.config()
 
@@ -44,10 +46,13 @@ app.use(
   })
 )
 
-// app.use((req, res, next) => {
-//   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-//   next();
-// });
+app.use(
+  morgan(':method :url :status :response-time ms', {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+)
 
 app.use(helmet())
 app.use(

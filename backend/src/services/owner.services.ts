@@ -6,6 +6,7 @@ import TYPES from '../di/types'
 import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
+import { MESSAGES } from '../enums/message.constant'
 
 @injectable()
 export default class OwnerService implements IOwnerServices {
@@ -17,7 +18,7 @@ export default class OwnerService implements IOwnerServices {
   async getProfileByUserId(userId: string): Promise<IOwnerProfile> {
     const profile = await this._ownerProfileRepository.findByUserId(userId)
     if (!profile) {
-      throw new AppError(HttpStatus.NOT_FOUND, 'Owner profile not found')
+      throw new AppError(HttpStatus.NOT_FOUND, MESSAGES.USER.NOT_FOUND)
     }
     return profile
   }
