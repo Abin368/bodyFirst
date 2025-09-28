@@ -13,5 +13,7 @@ export const ROUTES = {
 
   OWNER: {
     PROFILE_ME: '/profile/me',
+    UPLOAD_IMG: '/gym/upload-image',
+    SUBMIT_GYM: '/gym/finalize',
   },
 }

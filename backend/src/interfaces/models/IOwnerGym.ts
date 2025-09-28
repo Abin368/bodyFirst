@@ -1,8 +1,8 @@
-import { Document, ObjectId } from 'mongoose'
+import mongoose, { Document } from 'mongoose'
 import {} from 'mongoose'
 export interface IOwnerGym extends Document {
-  _id: ObjectId
-  ownerId: ObjectId
+  _id: mongoose.Types.ObjectId
+  ownerId: mongoose.Types.ObjectId
   name: string
   address: {
     city: string

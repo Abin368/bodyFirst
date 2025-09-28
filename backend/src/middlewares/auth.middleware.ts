@@ -17,7 +17,7 @@ export const authMiddleware: RequestHandler = (req, res, next) => {
     const decoded = verifyAccessToken(token) as { userId: string; role: string }
     ;(req as AuthRequest).user = { id: decoded.userId, role: decoded.role }
     next()
-  }  catch (err: unknown) {
+  } catch (err: unknown) {
     if (err instanceof AppError) {
       next(err)
     } else if (err instanceof Error) {

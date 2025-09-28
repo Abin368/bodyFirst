@@ -1,4 +1,4 @@
-import { Model, Document } from 'mongoose'
+import { Model, Document, SaveOptions } from 'mongoose'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
 
@@ -6,10 +6,10 @@ export abstract class BaseRepository<T extends Document> {
   constructor(protected model: Model<T>) {}
 
   //-----------------------------------------------
-  async create(data: Partial<T>): Promise<T> {
+  async create(data: Partial<T>, options?: SaveOptions): Promise<T> {
     try {
       const doc = new this.model(data)
-      return await doc.save()
+      return await doc.save(options)
     } catch (error: any) {
       throw new AppError(
         HttpStatus.INTERNAL_SERVER_ERROR,

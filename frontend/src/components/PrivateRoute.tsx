@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { authStore } from '@/store/authStore'
+import LoadingOverlay from './common/LoadingOverlay'
 
 interface PrivateRouteProps {
   children: React.ReactNode
@@ -12,7 +13,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = observer(({ children }) => {
   const pathnameRole = location.pathname.split('/')[1]
 
   if (authStore.isLoading) {
-    return <div>Loading...</div>
+    return <LoadingOverlay />
   }
 
   if (!authStore.isAuthenticated) {

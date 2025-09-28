@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ownerStore } from '@/store/ownerStore'
@@ -7,10 +7,33 @@ import { GymSchema, type GymFormValues } from '@/schemas/gym'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import Cropper from 'react-easy-crop'
+import type { Area } from 'react-easy-crop'
+import getCroppedImg from '@/utils/cropImage'
+import { OwnerService } from '@/services/ownerService'
+import { Toast } from '@/components/common/Toast'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 
 const CreateGym = observer(() => {
   const [loading, setLoading] = useState<boolean>(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imageURL, setImageURL] = useState<string | null>(null)
+  const [cropModalOpen, setCropModalOpen] = useState<boolean>(false)
+  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState<number>(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [tempImageKey, setTempImageKey] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState<'success' | 'error'>('success')
+  const [showToast, setShowToast] = useState(false)
+
+  const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage(message)
+    setToastType(type)
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
+  }
 
   const {
     register,
@@ -28,34 +51,90 @@ const CreateGym = observer(() => {
     },
   })
 
-  const onSubmit = async (data: GymFormValues) => {
+  const onCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }, [])
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0])
+      setCropModalOpen(true)
+      setCrop({ x: 0, y: 0 })
+      setZoom(1)
+    }
+  }
+
+  const handleUploadCroppedImage = async () => {
+    if (!imageFile || !croppedAreaPixels) return
     setLoading(true)
     try {
-      // await ownerStore.createGym(data)
-      await ownerStore.fetchProfile()
-      console.log('Gym Created', data)
+      const croppedBlob = await getCroppedImg(imageFile, croppedAreaPixels)
+      const formData = new FormData()
+      formData.append('file', croppedBlob)
+      const { key, url } = await OwnerService.uploadGymImage(formData)
+      setImageURL(url)
+      setTempImageKey(key)
+      setPreviewUrl(URL.createObjectURL(croppedBlob))
+      setCropModalOpen(false)
+      setImageFile(null)
+      showToastMessage('Image uploaded successfully!', 'success')
     } catch (err) {
-      console.error(err)
+      console.error('Image upload failed', err)
+      showToastMessage('Image upload failed!', 'error')
     } finally {
       setLoading(false)
     }
   }
 
+  const handleCancelCrop = () => {
+    setCropModalOpen(false)
+    setImageFile(null)
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+  }
+
+  const onSubmit = async (data: GymFormValues) => {
+    if (!tempImageKey) {
+      showToastMessage('Please upload and crop your gym image.', 'error')
+      return
+    }
+    setLoading(true)
+    try {
+      const payload = { ...data, tempImageKey }
+      await ownerStore.createGym(payload)
+      await ownerStore.fetchProfile()
+      showToastMessage('Gym created successfully!', 'success')
+    } catch (err) {
+      console.error(err)
+      showToastMessage('Failed to create gym. Try again.', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
+
   return (
-    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl p-10 transform transition-all duration-500 hover:shadow-3xl">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Full-page loading overlay */}
+      {loading && (
+        <LoadingOverlay message={cropModalOpen ? 'Uploading image...' : 'Creating your gym...'} />
+      )}
+
+      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl p-10 transform transition-all duration-500 hover:shadow-3xl z-10">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 animate-fade-in-up">
-            Launch Your Gym with BodyFirst
+            Build Your Gym Profile
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto animate-fade-in-up animate-delay-200">
-            Create a standout gym profile to attract members and streamline your operations
-            effortlessly.
+            Showcase your gym on BodyFirst and attract members with a stunning profile.
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Gym Name */}
           <div>
@@ -70,7 +149,7 @@ const CreateGym = observer(() => {
             )}
           </div>
 
-          {/* Contact & Website */}
+          {/* Contact and Website */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -165,37 +244,64 @@ const CreateGym = observer(() => {
             </div>
           </div>
 
-          {/* Gallery Images */}
+          {/* Gym Image */}
           <div>
-            <Label className="block text-sm font-semibold text-gray-800 mb-2">
-              Gallery Images (Comma-separated URLs)
-            </Label>
-            <Textarea
-              {...register('images')}
-              placeholder="https://img1.com, https://img2.com"
-              className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-300 outline-none resize-none text-base"
-              rows={4}
-            />
-            {errors.images && (
-              <p className="text-red-500 text-sm mt-2 animate-fade-in">{errors.images.message}</p>
-            )}
+            <Label className="block text-sm font-semibold text-gray-800 mb-2">Gym Image</Label>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="mt-1 text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-100 file:text-indigo-600 hover:file:bg-indigo-200 transition-all duration-300"
+              />
+              {previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt="Gym Preview"
+                  className="mt-2 w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
+                />
+              )}
+            </div>
           </div>
 
-          {/* Services */}
-          <div>
-            <Label className="block text-sm font-semibold text-gray-800 mb-2">
-              Services (Comma-separated)
-            </Label>
-            <Textarea
-              {...register('services')}
-              placeholder="Gym, Pool, Yoga, Personal Training"
-              className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-300 outline-none resize-none text-base"
-              rows={4}
-            />
-            {errors.services && (
-              <p className="text-red-500 text-sm mt-2 animate-fade-in">{errors.services.message}</p>
-            )}
-          </div>
+          {/* Cropping Modal */}
+          {cropModalOpen && imageFile && (
+            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fade-in">
+              <div className="bg-white p-6 rounded-2xl shadow-xl w-[90%] max-w-lg">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Crop Your Gym Image</h3>
+                <div className="relative h-[400px] w-full bg-gray-100 rounded-lg overflow-auto">
+                  <Cropper
+                    image={URL.createObjectURL(imageFile)}
+                    crop={crop}
+                    zoom={zoom}
+                    cropShape="rect"
+                    aspect={undefined}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+                <div className="mt-4 flex justify-between">
+                  <Button
+                    type="button"
+                    onClick={handleCancelCrop}
+                    variant="secondary"
+                    className="py-2 px-4 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all duration-300"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleUploadCroppedImage}
+                    disabled={loading}
+                    className="py-2 px-4 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Upload Image
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Submit */}
           <Button
@@ -203,29 +309,11 @@ const CreateGym = observer(() => {
             disabled={loading}
             className="w-full py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Creating...
-              </span>
-            ) : (
-              'Create Gym'
-            )}
+            Create Gym
           </Button>
+
+          {/* Toast */}
+          <Toast message={toastMessage} type={toastType} show={showToast} />
         </form>
       </div>
     </div>

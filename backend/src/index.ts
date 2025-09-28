@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import express from 'express'
 import client from 'prom-client'
 import dotenv from 'dotenv'
+dotenv.config()
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
@@ -13,8 +14,6 @@ import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
 import morgan from 'morgan'
 import logger from './utils/logger'
-
-dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 8000

@@ -29,5 +29,13 @@ export const MESSAGES = {
 
   OWNER: {
     PROFILE_FETCHED_SUCCESS: 'Owner profile fetched successfully',
+    NO_FILE: 'No File uploaded',
+    FILE_UPLOAD_SUCCESS: 'Image uploaded successfully',
+    FILE_UPLOAD_FAILED: 'File upload failed',
+    INVALID_FILE_UPLOAD: 'Invalid file uploaded',
+    FILE_MOVE_FAILED: 'File move failed',
+    FILE_DELETE_FAILED: 'File delete failed',
+    GYM_CREATED_SUCCESS: 'Gym created successfully',
+    GYM_CREATION_FAILED: 'Gym creation failed',
   },
 }
