@@ -13,6 +13,7 @@ import { OAuth2Client } from 'google-auth-library'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
 import { IPasswordService } from '../interfaces/services/IPasswordService'
+import { MESSAGES } from '../enums/message.constant'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -44,7 +45,7 @@ export default class AuthService implements IAuthService {
     const existingUser = await this._userRepository.findByEmail(email)
 
     if (existingUser) {
-      throw new AppError(HttpStatus.BAD_REQUEST, 'User already exists')
+      throw new AppError(HttpStatus.BAD_REQUEST, MESSAGES.USER.ALREADY_EXISTS)
     }
 
     const otp = this._otpService.generateOtp()
@@ -54,7 +55,7 @@ export default class AuthService implements IAuthService {
       await this._emailService.sendOtp(email, otp, 'signup')
     } catch {
       await this._otpService.deleteOtp(email, otp)
-      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to send OTP')
+      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGES.OTP.FAILED)
     }
   }
 
@@ -70,7 +71,7 @@ export default class AuthService implements IAuthService {
     const isValid = await this._otpService.verifyOtp(email, otp)
 
     if (!isValid) {
-      throw new AppError(HttpStatus.BAD_REQUEST, 'Invalid or expired OTP')
+      throw new AppError(HttpStatus.BAD_REQUEST, MESSAGES.OTP.INVALID)
     }
 
     const passwordHash = await this._passwordService.hash(password)
@@ -99,16 +100,15 @@ export default class AuthService implements IAuthService {
   ): Promise<Tokens & { role: Role; userId: string }> {
     const user = await this._userRepository.findByEmail(email)
     if (!user) {
-      console.log('i am here')
-      throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+      throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.INVALID_CREDENTIALS)
     }
 
     if (user.role !== role) {
-      throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+      throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.INVALID_CREDENTIALS)
     }
 
     const isMatch = await this._passwordService.compare(password, user.passwordHash)
-    if (!isMatch) throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+    if (!isMatch) throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.INVALID_CREDENTIALS)
 
     return this.generateTokens(user)
   }
@@ -122,7 +122,7 @@ export default class AuthService implements IAuthService {
 
     const validRoles: Role[] = ['owner', 'member', 'trainer']
     if (!validRoles.includes(decodedRaw.role as Role)) {
-      throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid role in token')
+      throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.INVALID_ROLE)
     }
 
     const decoded: DecodedToken = {
@@ -153,7 +153,7 @@ export default class AuthService implements IAuthService {
 
     const payload = ticket.getPayload()
     if (!payload || !payload.email) {
-      throw new AppError(HttpStatus.UNAUTHORIZED, 'Invalid Google token')
+      throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.GOOGLETOKEN_INVALID)
     }
 
     let user = await this._userRepository.findByEmail(payload.email)
@@ -185,11 +185,11 @@ export default class AuthService implements IAuthService {
     const existingUser = await this._userRepository.findByEmail(email)
 
     if (!existingUser) {
-      throw new AppError(HttpStatus.NOT_FOUND, 'User not exists')
+      throw new AppError(HttpStatus.NOT_FOUND, MESSAGES.USER.NOT_FOUND)
     }
 
     if (existingUser.role != role) {
-      throw new AppError(HttpStatus.FORBIDDEN, 'Not authorized')
+      throw new AppError(HttpStatus.FORBIDDEN, MESSAGES.AUTH.UNAUTHORIZED)
     }
 
     const otp = this._otpService.generateOtp()
@@ -203,7 +203,7 @@ export default class AuthService implements IAuthService {
     } catch {
       await this._otpService.deleteOtp(email, otp)
       await this._otpService.deleteResetSession(resetToken)
-      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to send OTP')
+      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGES.OTP.FAILED)
     }
 
     return { resetToken }
@@ -213,7 +213,7 @@ export default class AuthService implements IAuthService {
     const isValid = await this._otpService.verifyOtp(email, otp)
 
     if (!isValid) {
-      throw new AppError(HttpStatus.BAD_REQUEST, 'Invalid or expired OTP')
+      throw new AppError(HttpStatus.BAD_REQUEST, MESSAGES.OTP.FAILED)
     }
 
     await this._otpService.verifyResetSession(resetToken)
@@ -221,13 +221,13 @@ export default class AuthService implements IAuthService {
   //-----------------------------
   async resetPassword(resetToken: string, password: string, confimPassword: string): Promise<void> {
     if (password != confimPassword) {
-      throw new AppError(HttpStatus.BAD_REQUEST, 'Passwords do not match')
+      throw new AppError(HttpStatus.BAD_REQUEST, MESSAGES.AUTH.PASSWORD_MISSMATCH)
     }
 
     const session = await this._otpService.getResetSession(resetToken)
 
     if (!session || !session.verified) {
-      throw new AppError(HttpStatus.BAD_REQUEST, 'Reset session not verified or expired')
+      throw new AppError(HttpStatus.BAD_REQUEST, MESSAGES.AUTH.SESSION_EXPIRED)
     }
 
     const hashedPassword = await this._passwordService.hash(password)

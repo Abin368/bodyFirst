@@ -14,6 +14,7 @@ import TYPES from '../di/types'
 import { IAuthController } from '../interfaces/controllers/IAuthController'
 import { HttpStatus } from '../enums/http.status'
 import { AppError } from '../errors/app.error'
+import { MESSAGES } from '../enums/message.constant'
 import {
   ForgetResponseOtpSchema,
   ForgetResponseVerifyOtpSchema,
@@ -32,41 +33,37 @@ export default class AuthController implements IAuthController {
   ) {}
 
   private setRefreshToken(res: Response, refreshToken: string): void {
+    const maxAge = Number(process.env.REFRESH_TOKEN_MAX_AGE) || 7 * 24 * 60 * 60 * 1000
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge,
     })
   }
 
   //---------------------------------------------------------
-  requestOtp = async (req: Request, res: Response): Promise<void> => {
-    const body = RequestOtpSchema.parse(req.body)
-    await this._authService.requestSignup(body.email, body.role)
+  requestOtp = async (req: Request, res: Response): Promise<Response> => {
+    const { email, role } = RequestOtpSchema.parse(req.body)
+    await this._authService.requestSignup(email, role)
 
     const response = RequestOtpResponseSchema.parse({
       success: true,
-      message: 'OTP sent successfully',
+      message: MESSAGES.OTP.SENT,
     })
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //--------------------------------------------------
-  verifyOtp = async (req: Request, res: Response): Promise<void> => {
-    const body = VerifyOtpSchema.parse(req.body)
-    const result = await this._authService.verifySignupOtp(
-      body.email,
-      body.otp,
-      body.fullName,
-      body.password,
-      body.role
-    )
-    res.status(HttpStatus.CREATED).json({ message: 'OTP verified Successfully', ...result })
+  verifyOtp = async (req: Request, res: Response): Promise<Response> => {
+    const { email, otp, fullName, password, role } = VerifyOtpSchema.parse(req.body)
+    const result = await this._authService.verifySignupOtp(email, otp, fullName, password, role)
+    return res.status(HttpStatus.CREATED).json({ message: MESSAGES.OTP.VERIFIED, ...result })
   }
   //---------------------------------------------------
-  login = async (req: Request, res: Response): Promise<void> => {
-    const body = LoginSchema.parse(req.body)
-    const tokens = await this._authService.login(body.email, body.password, body.role)
+  login = async (req: Request, res: Response): Promise<Response> => {
+    const { email, password, role } = LoginSchema.parse(req.body)
+    const tokens = await this._authService.login(email, password, role)
 
     this.setRefreshToken(res, tokens.refreshToken)
 
@@ -76,18 +73,18 @@ export default class AuthController implements IAuthController {
       userId: tokens.userId,
     })
 
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //--------------------------------------------
-  refreshToken = async (req: Request, res: Response): Promise<void> => {
+  refreshToken = async (req: Request, res: Response): Promise<Response> => {
     const token = req.cookies.refreshToken
-    if (!token) throw new AppError(HttpStatus.UNAUTHORIZED, 'Unauthorized')
+    if (!token) throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.UNAUTHORIZED)
 
     const tokens = await this._authService.refreshToken(token)
-    res.status(HttpStatus.OK).json(tokens)
+    return res.status(HttpStatus.OK).json(tokens)
   }
   //-----------------------------------------------------
-  logout = async (req: Request, res: Response): Promise<void> => {
+  logout = async (req: Request, res: Response): Promise<Response> => {
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -95,13 +92,13 @@ export default class AuthController implements IAuthController {
     })
 
     const response = logoutSchema.parse({
-      message: 'Logged out succesfully',
+      message: MESSAGES.AUTH.LOGOUT_SUCCESS,
     })
 
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //--------------------------------------------
-  googleLogin = async (req: Request, res: Response): Promise<void> => {
+  googleLogin = async (req: Request, res: Response): Promise<Response> => {
     const { idToken, role } = req.body
     const tokens = await this._authService.googleLogin(idToken, role)
 
@@ -112,40 +109,40 @@ export default class AuthController implements IAuthController {
       role: tokens.role,
       userId: tokens.userId,
     })
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //------------------------------------------------------
   forgetOtp = async (req: Request, res: Response) => {
-    const body = ForgetPasswordOtpSchema.parse(req.body)
-    const resetToken = await this._authService.forgetOtpRequest(body.email, body.role)
+    const { email, role } = ForgetPasswordOtpSchema.parse(req.body)
+    const resetToken = await this._authService.forgetOtpRequest(email, role)
     const response = ForgetResponseOtpSchema.parse({
       success: true,
-      message: 'OTP sent successfully',
+      message: MESSAGES.OTP.SENT,
       resetToken,
     })
     res.status(HttpStatus.OK).json(response)
   }
   //------------------------------------------------------------
-  verifyForgetOtp = async (req: Request, res: Response): Promise<void> => {
-    const body = ForgetPasswordVerifyOtpSchema.parse(req.body)
-    await this._authService.verifyResetOtp(body.email, body.otp, body.resetToken)
+  verifyForgetOtp = async (req: Request, res: Response): Promise<Response> => {
+    const { email, otp, resetToken } = ForgetPasswordVerifyOtpSchema.parse(req.body)
+    await this._authService.verifyResetOtp(email, otp, resetToken)
 
     const response = ForgetResponseVerifyOtpSchema.parse({
       success: true,
-      message: 'OTP verified successfully',
+      message: MESSAGES.OTP.VERIFIED,
     })
-    res.status(HttpStatus.CREATED).json(response)
+    return res.status(HttpStatus.CREATED).json(response)
   }
 
   //---------------------------------------
-  resetPassword = async (req: Request, res: Response): Promise<void> => {
-    const body = ResetPasswordSchema.parse(req.body)
-    await this._authService.resetPassword(body.resetToken, body.password, body.confirmPassword)
+  resetPassword = async (req: Request, res: Response): Promise<Response> => {
+    const { resetToken, password, confirmPassword } = ResetPasswordSchema.parse(req.body)
+    await this._authService.resetPassword(resetToken, password, confirmPassword)
 
     const response = ResetPasswordResponseSchema.parse({
       success: true,
-      message: 'Password reset successful',
+      message: MESSAGES.AUTH.PASSWORD_RESET,
     })
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
 }

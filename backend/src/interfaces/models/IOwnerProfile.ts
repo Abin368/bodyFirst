@@ -1,9 +1,10 @@
 import { Document, ObjectId } from 'mongoose'
+import mongoose from 'mongoose'
 
 export interface IOwnerProfile extends Document {
   _id: ObjectId
-  userId: ObjectId
-  gymId: ObjectId
+  userId: mongoose.Types.ObjectId
+  gymId: mongoose.Types.ObjectId
 
   contactNo: string
   website?: string

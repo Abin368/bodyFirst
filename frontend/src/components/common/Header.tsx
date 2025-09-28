@@ -36,7 +36,9 @@ const Header: React.FC = observer(() => {
       } else {
         navigate('/', { replace: true })
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const navLinks = isLoggedIn ? (

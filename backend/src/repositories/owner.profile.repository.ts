@@ -1,11 +1,14 @@
 import ownerProfile from '../models/owner.model'
 import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
 import { IOwnerProfileRepository } from '../interfaces/repository/IOwnerProfileRepository'
+import { BaseRepository } from './base.repository'
 
-export default class OwnerProfileRepository implements IOwnerProfileRepository {
-  async create(data: Partial<IOwnerProfile>): Promise<IOwnerProfile> {
-    const profile = new ownerProfile(data)
-    return await profile.save()
+export default class OwnerProfileRepository
+  extends BaseRepository<IOwnerProfile>
+  implements IOwnerProfileRepository
+{
+  constructor() {
+    super(ownerProfile)
   }
 
   async findByUserId(userId: string): Promise<IOwnerProfile | null> {

@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import express from 'express'
 import client from 'prom-client'
 import dotenv from 'dotenv'
+dotenv.config()
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
@@ -11,8 +12,8 @@ import ownerRoutes from './routes/owner.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
-
-dotenv.config()
+import morgan from 'morgan'
+import logger from './utils/logger'
 
 const app = express()
 const PORT = process.env.PORT || 8000
@@ -44,10 +45,13 @@ app.use(
   })
 )
 
-// app.use((req, res, next) => {
-//   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-//   next();
-// });
+app.use(
+  morgan(':method :url :status :response-time ms', {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+)
 
 app.use(helmet())
 app.use(

@@ -46,7 +46,7 @@ const ForgetPassword: React.FC = () => {
       } else {
         setError(response.message)
       }
-    } catch (err: any) {
+    } catch (err:any) {
       setError(err.response?.data?.message || err.message || 'OTP request failed. Try again.')
     } finally {
       setLoading(false)

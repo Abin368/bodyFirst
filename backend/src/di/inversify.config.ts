@@ -7,7 +7,9 @@ import OwnerController from '../controllers/owner.controller'
 
 //repository
 import UserRepository from '../repositories/user.repository'
-import OwnerProfileRepository from '../repositories/owner.repository'
+import OwnerProfileRepository from '../repositories/owner.profile.repository'
+import S3Repository from '../repositories/s3.repository'
+import OwnerGymRepository from '../repositories/owner.gym.repository'
 
 //user services
 import TokenService from '../services/token.service'
@@ -15,6 +17,7 @@ import OtpService from '../services/otp.service'
 import EmailService from '../services/email.service'
 import AuthService from '../services/auth.service'
 import PasswordService from '../services/password.repository'
+import { ImageService } from '../services/image.service'
 
 //owner side services
 import OwnerService from '../services/owner.services'
@@ -33,4 +36,7 @@ container.bind<OwnerController>(TYPES.OwnerController).to(OwnerController)
 container.bind<OwnerService>(TYPES.OwnerService).to(OwnerService)
 container.bind<OwnerProfileRepository>(TYPES.OwnerProfileRepository).to(OwnerProfileRepository)
 
+container.bind<S3Repository>(TYPES.S3Repository).to(S3Repository)
+container.bind<OwnerGymRepository>(TYPES.OwnerGymRepository).to(OwnerGymRepository)
+container.bind<ImageService>(TYPES.ImageService).to(ImageService)
 export default container

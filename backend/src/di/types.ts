@@ -9,6 +9,9 @@ const TYPES = {
   OwnerService: Symbol.for('OwnerService'),
   OwnerController: Symbol.for('OwnerController'),
   OwnerProfileRepository: Symbol.for('OwnerProfileRepository'),
+  S3Repository: Symbol.for('S3Repository'),
+  OwnerGymRepository: Symbol.for('OwnerGymRepository'),
+  ImageService: Symbol.for('ImageService'),
 }
 
 export default TYPES

@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { authStore } from '@/store/authStore'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 
 interface Props {
   children: React.ReactNode
@@ -9,7 +10,7 @@ interface Props {
 
 const GuestRoute: React.FC<Props> = observer(({ children, role }) => {
   if (authStore.isLoading) {
-    return <div>Loading...</div>
+    return <LoadingOverlay />
   }
 
   if (authStore.isAuthenticated) {

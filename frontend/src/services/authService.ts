@@ -1,10 +1,11 @@
 import axiosInstance from './axiosInstance'
 import axios from 'axios'
 import type { SignupRequestData, SignupVerifyData } from '@/types/auth'
+import { API_ROUTES } from '@/constants/apiRoutes'
 
 // Login
 export const loginUser = async (email: string, password: string, role: string) => {
-  const response = await axiosInstance.post('/auth/login', { email, password, role })
+  const response = await axiosInstance.post(API_ROUTES.AUTH.LOGIN, { email, password, role })
   return response.data
 }
 
@@ -19,23 +20,23 @@ export const refreshAccessToken = async () => {
 
 // Request OTP
 export const signupRequestOtp = async (data: SignupRequestData) => {
-  const response = await axiosInstance.post('/auth/signup/request-otp', data)
+  const response = await axiosInstance.post(API_ROUTES.AUTH.SIGNUP_REQUEST_OTP, data)
   return response.data
 }
 
 // Verify OTP
 export const signupVerifyOtp = async (data: SignupVerifyData) => {
-  const response = await axiosInstance.post('/auth/signup/verify-otp', data)
+  const response = await axiosInstance.post(API_ROUTES.AUTH.SIGNUP_VERIFY_OTP, data)
   return response.data
 }
 
 export const logoutUser = async () => {
-  await axiosInstance.post('/auth/logout')
+  await axiosInstance.post(API_ROUTES.AUTH.LOGOUT)
 }
 
 export const googleLogin = async (idToken: string, role: string) => {
   const response = await axiosInstance.post(
-    '/auth/google',
+    API_ROUTES.AUTH.GOOGLE,
     { idToken, role },
     { withCredentials: true }
   )
@@ -44,9 +45,8 @@ export const googleLogin = async (idToken: string, role: string) => {
 }
 
 export const forgetRequestOtp = async (email: string, role: string) => {
-  const response = await axiosInstance.post('/auth/forget/request-otp', { email, role })
+  const response = await axiosInstance.post(API_ROUTES.AUTH.FORGET_REQUEST_OTP, { email, role })
 
-  console.log('response', response)
   return response.data
 }
 
@@ -56,7 +56,7 @@ export const forgetVerifyOtp = async (
   otp: string,
   resetToken: string
 ) => {
-  const response = await axiosInstance.post('/auth/forget/verify-otp', {
+  const response = await axiosInstance.post(API_ROUTES.AUTH.FORGET_VERIFY_OTP, {
     email,
     role,
     otp,
@@ -70,7 +70,7 @@ export const resetPassword = async (
   confirmPassword: string,
   resetToken: string
 ) => {
-  const response = await axiosInstance.post('/auth/reset-password', {
+  const response = await axiosInstance.post(API_ROUTES.AUTH.RESET_PASSWORD, {
     password,
     confirmPassword,
     resetToken,
