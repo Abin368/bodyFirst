@@ -1,4 +1,4 @@
-import { IOwnerGym } from '../interfaces/models/IOwnerGym'
+import { IOwnerGym } from '../../interfaces/models/IOwnerGym'
 import { Schema, model } from 'mongoose'
 
 const OwnerGymSchema = new Schema<IOwnerGym>(

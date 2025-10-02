@@ -1,5 +1,5 @@
-import { IOtpService } from '../interfaces/otp/IOtpService'
-import { redisClient } from '../config/redis'
+import { IOtpService } from '../../interfaces/otp/IOtpService'
+import { redisClient } from '../../config/redis'
 import { v4 as uuid } from 'uuid'
 export default class OtpService implements IOtpService {
   generateOtp(): string {

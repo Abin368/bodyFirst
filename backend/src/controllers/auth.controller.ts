@@ -6,7 +6,7 @@ import {
   ForgetPasswordOtpSchema,
   ForgetPasswordVerifyOtpSchema,
   ResetPasswordSchema,
-} from '../dtos/auth.dto'
+} from '../dtos/auth/auth.dto'
 import { ITokenService } from '../interfaces/services/ITokenService'
 import { IAuthService } from '../interfaces/services/IAuthService'
 import { injectable, inject } from 'inversify'
@@ -23,7 +23,7 @@ import {
   RequestOtpResponseSchema,
   ResetPasswordResponseSchema,
   logoutSchema,
-} from '../dtos/auth.response.dto'
+} from '../dtos/auth/auth.response.dto'
 
 @injectable()
 export default class AuthController implements IAuthController {

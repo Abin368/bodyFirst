@@ -10,17 +10,21 @@ export interface IOwnerProfile extends Document {
   website?: string
 
   // Gym setup
-  trainerIds: ObjectId[]
-  numberOfTrainers: number
-  services: string[]
-  plans: { name: string; price: number; duration: number }[]
+  trainerIds?: ObjectId[]
+  numberOfTrainers?: number
+  services?: string[]
+  plans?: { name?: string; price?: number; duration?: number }[]
 
   // Subscription
   subscriptionStatus: 'ACTIVE' | 'INACTIVE' | 'EXPIRED'
-  subscriptionStart: Date
-  subscriptionExpiry: Date
+  subscriptionStart?: Date
+  subscriptionExpiry?: Date
   autoRenew?: boolean
   lastPaymentId?: ObjectId
+
+  stripeCustomerId?:string
+  stripeSubscriptionId?:string
+  stripePriceId?:string
 
   createdAt: Date
   updatedAt: Date

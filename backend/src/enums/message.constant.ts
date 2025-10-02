@@ -37,5 +37,16 @@ export const MESSAGES = {
     FILE_DELETE_FAILED: 'File delete failed',
     GYM_CREATED_SUCCESS: 'Gym created successfully',
     GYM_CREATION_FAILED: 'Gym creation failed',
+    CHECKOUT_SUCCESS:'Checkout session created successfully',
+    CHECKOUT_FAILED:'Failed to create Stripe Checkout session',
+    FILE_TOO_LARGE:'File is too large'
   },
+
+    STRIPE: {
+      INVALID_PAYLOAD: 'Invalid or missing webhook payload',
+      INVALID_SIGNATURE: 'Invalid Stripe signature',
+      WEBHOOK_RECEIVED: 'Webhook received successfully',
+    
+    },
+
 }

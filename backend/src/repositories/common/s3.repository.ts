@@ -1,10 +1,10 @@
 import { injectable } from 'inversify'
 import AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { IS3Repository } from '../interfaces/repository/IS3Repository'
-import { AppError } from '../errors/app.error'
-import { HttpStatus } from '../enums/http.status'
-import { MESSAGES } from '../enums/message.constant'
+import { IS3Repository } from '../../interfaces/repository/IS3Repository'
+import { AppError } from '../../errors/app.error'
+import { HttpStatus } from '../../enums/http.status'
+import { MESSAGES } from '../../enums/message.constant'
 
 @injectable()
 export default class S3Repository implements IS3Repository {

@@ -1,6 +1,6 @@
 import { Model, Document, SaveOptions } from 'mongoose'
-import { AppError } from '../errors/app.error'
-import { HttpStatus } from '../enums/http.status'
+import { AppError } from '../../errors/app.error'
+import { HttpStatus } from '../../enums/http.status'
 
 export abstract class BaseRepository<T extends Document> {
   constructor(protected model: Model<T>) {}

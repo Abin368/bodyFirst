@@ -2,14 +2,23 @@ import { observer } from 'mobx-react-lite'
 import { ownerStore } from '@/store/ownerStore'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import { Toast } from '@/components/common/Toast'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 
 const plans = [
   {
     id: 'basic',
     title: 'Basic Plan',
     price: '₹999 / month',
+    stripePriceId: import.meta.env.VITE_PUBLIC_STRIPE_PRICE_BASIC,
     description: 'Ideal for small gyms starting their digital journey.',
-    features: ['Member Management', 'Basic Workout Builder', 'Payment Processing', 'Email Support'],
+    features: [
+      'Member Management',
+      'Basic Workout Builder',
+      'Payment Processing',
+      'Email Support',
+    ],
     active: true,
     popular: true,
   },
@@ -44,14 +53,43 @@ const plans = [
 ]
 
 const SubscriptionPage = observer(() => {
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState<'success' | 'error'>('success')
+  const [showToast, setShowToast] = useState(false)
+  
+ 
+
+  const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage(message)
+    setToastType(type)
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 1000)
+  }
+
+  const handlePayment = async (priceId: string) => {
+    try {
+      ownerStore.loading = true
+      showToastMessage('Redirecting to secure checkout...')
+      await ownerStore.handlePayment(priceId)
+      
+    } catch (err) {
+      console.error(err)
+      showToastMessage('Payment failed. Please try again.', 'error')
+    } finally {
+      ownerStore.loading = false
+    }
+  }
+  
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <h1 className="text-5xl font-extrabold text-gray-900 mb-4 tracking-tight animate-fade-in-up">
+        <h1 className="text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
           Power Your Gym with <span className="text-indigo-600">BodyFirst</span>
         </h1>
-        <p className="text-lg text-gray-600 leading-relaxed animate-fade-in-up animate-delay-200">
+        <p className="text-lg text-gray-600 leading-relaxed">
           Choose the plan that fits your gym’s needs and start transforming your operations today.
         </p>
       </div>
@@ -60,6 +98,7 @@ const SubscriptionPage = observer(() => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full">
         {plans.map((plan) => {
           const isAlreadySubscribed = ownerStore.isSubscribed && plan.active
+
           return (
             <Card
               key={plan.id}
@@ -112,11 +151,7 @@ const SubscriptionPage = observer(() => {
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   }`}
                   disabled={!plan.active || isAlreadySubscribed}
-                  onClick={() => {
-                    if (plan.active && !isAlreadySubscribed) {
-                      console.log('Proceed to Razorpay for', plan.id)
-                    }
-                  }}
+                  onClick={() => handlePayment(plan.stripePriceId!)}
                 >
                   {isAlreadySubscribed
                     ? 'Subscribed'
@@ -129,6 +164,10 @@ const SubscriptionPage = observer(() => {
           )
         })}
       </div>
+
+      {ownerStore.loading && <LoadingOverlay />}
+
+      <Toast message={toastMessage} type={toastType} show={showToast} />
     </div>
   )
 })

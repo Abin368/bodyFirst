@@ -18,3 +18,11 @@ export const GymSchema = z.object({
 })
 
 export type GymSchema = z.infer<typeof GymSchema>
+
+
+export const CheckoutPaymentSchema = z.object({
+  priceId: z.string(),
+})
+
+export type CheckoutPaymentSchema = z.infer<typeof CheckoutPaymentSchema>
+

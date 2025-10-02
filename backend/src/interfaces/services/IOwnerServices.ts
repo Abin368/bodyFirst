@@ -1,5 +1,5 @@
 import { IOwnerProfile } from '../models/IOwnerProfile'
-import { GymSchema } from '../../dtos/owner.dtos'
+import { GymSchema } from '../../dtos/auth/owner.dtos'
 import mongoose from 'mongoose'
 import { IOwnerGym } from '../models/IOwnerGym'
 
@@ -10,6 +10,8 @@ export interface IOwnerServices {
     userId: string,
     gymData: GymSchema & { tempImageKey?: string }
   ): Promise<{ gym: IOwnerGym; profile: IOwnerProfile }>
+
+  checkoutPayment(userId:string,priceId:string):Promise<string>
 }
 
 export interface GymCreateDTO {

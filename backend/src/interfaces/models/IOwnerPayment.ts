@@ -1,10 +1,11 @@
-import { Document, ObjectId } from 'mongoose'
+import { Document, ObjectId ,Types} from 'mongoose'
+import mongoose from 'mongoose'
 
 export interface IOwnerPayment extends Document {
-  ownerId: ObjectId
-  razorpayOrderId: string
-  razorpayPaymentId?: string
-  razorpaySignature?: string
+  ownerId: Types.ObjectId 
+  stripeSessionId:string
+  stripePaymentIntentId:string
+  stripeEventId:string
   amount: number
   currency: string
   status: 'PENDING' | 'SUCCESS' | 'FAILED'

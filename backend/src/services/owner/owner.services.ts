@@ -1,18 +1,20 @@
 import { inject, injectable } from 'inversify'
-import { IOwnerServices } from '../interfaces/services/IOwnerServices'
-import { IOwnerProfileRepository } from '../interfaces/repository/IOwnerProfileRepository'
-import TYPES from '../di/types'
-import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
-import { AppError } from '../errors/app.error'
-import { HttpStatus } from '../enums/http.status'
-import { MESSAGES } from '../enums/message.constant'
-import { IUserRepository } from '../interfaces/repository/IUserRepository'
-import { IS3Repository } from '../interfaces/repository/IS3Repository'
-import { GymSchema } from '../dtos/owner.dtos'
+import { IOwnerServices } from '../../interfaces/services/IOwnerServices'
+import { IOwnerProfileRepository } from '../../interfaces/repository/IOwnerProfileRepository'
+import TYPES from '../../di/types'
+import { IOwnerProfile } from '../../interfaces/models/IOwnerProfile'
+import { AppError } from '../../errors/app.error'
+import { HttpStatus } from '../../enums/http.status'
+import { MESSAGES } from '../../enums/message.constant'
+import { IUserRepository } from '../../interfaces/repository/IUserRepository'
+import { IS3Repository } from '../../interfaces/repository/IS3Repository'
+import { GymSchema } from '../../dtos/auth/owner.dtos'
 import mongoose from 'mongoose'
-import { IOwnerGymRepository } from '../interfaces/repository/IOwnerGymRepository'
-import { IOwnerGym } from '../interfaces/models/IOwnerGym'
-import { IImageService } from '../interfaces/services/IImageService'
+import { IOwnerGymRepository } from '../../interfaces/repository/IOwnerGymRepository'
+import { IOwnerGym } from '../../interfaces/models/IOwnerGym'
+import { IImageService } from '../../interfaces/services/IImageService'
+import { IStripeService } from '../../interfaces/services/IStripeServices'
+import logger from '../../utils/logger'
 
 @injectable()
 export default class OwnerService implements IOwnerServices {
@@ -22,7 +24,8 @@ export default class OwnerService implements IOwnerServices {
     @inject(TYPES.UserRepository) private readonly _userRepository: IUserRepository,
     @inject(TYPES.S3Repository) private readonly _s3Repository: IS3Repository,
     @inject(TYPES.OwnerGymRepository) private readonly _ownerGymRepository: IOwnerGymRepository,
-    @inject(TYPES.ImageService) private readonly _imageService: IImageService
+    @inject(TYPES.ImageService) private readonly _imageService: IImageService,
+    @inject(TYPES.StripeServices) private readonly _stripeServices: IStripeService,
   ) {}
 
   private async createGymEntity(
@@ -40,6 +43,7 @@ export default class OwnerService implements IOwnerServices {
     gymData: GymSchema,
     session: mongoose.ClientSession
   ) {
+    logger.info(`Ensuring profile exists for user ID: ${userId}`);
     let profile = await this._ownerProfileRepository.findByUserId(userId)
     if (!profile) {
       profile = await this._ownerProfileRepository.create(
@@ -58,6 +62,7 @@ export default class OwnerService implements IOwnerServices {
   async getProfileByUserId(userId: string): Promise<IOwnerProfile> {
     const profile = await this._ownerProfileRepository.findByUserId(userId)
     if (!profile) {
+      logger.warn(`Profile not found for user ID: ${userId}`);
       throw new AppError(HttpStatus.NOT_FOUND, MESSAGES.USER.NOT_FOUND)
     }
     return profile
@@ -101,11 +106,24 @@ export default class OwnerService implements IOwnerServices {
 
       return { gym, profile }
     } catch (error) {
-     
+      logger.error('error creating',error)
       await session.abortTransaction()
       throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGES.OWNER.GYM_CREATION_FAILED)
     } finally {
       session.endSession()
     }
+  }
+
+  //---------------------------------------------
+  async checkoutPayment(userId:string,priceId:string):Promise<string>{
+
+   const profile = await this._ownerProfileRepository.findByUserId(userId)
+   if(!profile) throw new AppError(HttpStatus.NOT_FOUND,MESSAGES.USER.NOT_FOUND)
+
+   const checkoutUrl= await this._stripeServices.createCheckoutSession(priceId,userId)
+   if(!checkoutUrl) throw new AppError(HttpStatus.BAD_REQUEST,MESSAGES.OWNER.CHECKOUT_FAILED)
+    
+   return checkoutUrl
+
   }
 }

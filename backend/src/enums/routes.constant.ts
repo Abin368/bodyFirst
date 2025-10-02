@@ -15,5 +15,10 @@ export const ROUTES = {
     PROFILE_ME: '/profile/me',
     UPLOAD_IMG: '/gym/upload-image',
     SUBMIT_GYM: '/gym/finalize',
+    CREATE_CHECKOUT_SESSION: '/stripe/create-checkout-session',
   },
+
+  STRIPE:{
+    STRIPE_WEBHOOK:'/stripe/webhook',
+  }
 }

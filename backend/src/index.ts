@@ -9,6 +9,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import authRoutes from './routes/auth.routes'
 import ownerRoutes from './routes/owner.routes'
+import webhookRoutes from './routes/wehbook.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
@@ -61,7 +62,7 @@ app.use(
     message: 'Too many requests, please try again later.',
   })
 )
-
+app.use(webhookRoutes)
 app.use(express.json())
 app.use(cookieParser())
 

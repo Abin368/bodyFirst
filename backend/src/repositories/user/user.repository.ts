@@ -1,10 +1,10 @@
 import { injectable } from 'inversify'
-import { IUserRepository } from '../interfaces/repository/IUserRepository'
-import { IUser } from '../interfaces/models/IUser'
-import User from '../models/user.model'
-import { BaseRepository } from './base.repository'
-import { AppError } from '../errors/app.error'
-import { HttpStatus } from '../enums/http.status'
+import { IUserRepository } from '../../interfaces/repository/IUserRepository'
+import { IUser } from '../../interfaces/models/IUser'
+import User from '../../models/common/user.model'
+import { BaseRepository } from '../common/base.repository'
+import { AppError } from '../../errors/app.error'
+import { HttpStatus } from '../../enums/http.status'
 
 @injectable()
 export default class UserRepository extends BaseRepository<IUser> implements IUserRepository {

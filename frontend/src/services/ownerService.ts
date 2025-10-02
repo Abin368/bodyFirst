@@ -29,4 +29,9 @@ export const OwnerService = {
     return data.data
   },
   //-----------------------------------------
+
+  handlePayment:async (priceId:string):Promise<{checkoutUrl:string}>=>{
+    const {data} = await axiosInstance.post<ApiResponse<{ checkoutUrl: string }>>(API_ROUTES.OWNER.CREATE_CHECKOUT_SESSION,{priceId})
+    return data.data
+  }
 }

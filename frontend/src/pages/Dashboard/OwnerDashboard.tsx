@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { ownerStore } from '@/store/ownerStore'
 import { authStore } from '@/store/authStore'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 
 const OwnerDashboard = () => {
   useEffect(() => {
@@ -15,9 +16,9 @@ const OwnerDashboard = () => {
   }, [authStore.isAuthenticated])
 
   if (ownerStore.loading) {
-    return <p className="p-6">Loading...</p>
+    return <LoadingOverlay/>
   }
-
+  
   return (
     <>
       <Header />
