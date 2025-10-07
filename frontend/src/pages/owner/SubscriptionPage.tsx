@@ -13,12 +13,7 @@ const plans = [
     price: '₹999 / month',
     stripePriceId: import.meta.env.VITE_PUBLIC_STRIPE_PRICE_BASIC,
     description: 'Ideal for small gyms starting their digital journey.',
-    features: [
-      'Member Management',
-      'Basic Workout Builder',
-      'Payment Processing',
-      'Email Support',
-    ],
+    features: ['Member Management', 'Basic Workout Builder', 'Payment Processing', 'Email Support'],
     active: true,
     popular: true,
   },
@@ -56,8 +51,6 @@ const SubscriptionPage = observer(() => {
   const [toastMessage, setToastMessage] = useState('')
   const [toastType, setToastType] = useState<'success' | 'error'>('success')
   const [showToast, setShowToast] = useState(false)
-  
- 
 
   const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
     setToastMessage(message)
@@ -71,7 +64,6 @@ const SubscriptionPage = observer(() => {
       ownerStore.loading = true
       showToastMessage('Redirecting to secure checkout...')
       await ownerStore.handlePayment(priceId)
-      
     } catch (err) {
       console.error(err)
       showToastMessage('Payment failed. Please try again.', 'error')
@@ -79,8 +71,6 @@ const SubscriptionPage = observer(() => {
       ownerStore.loading = false
     }
   }
-  
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8">

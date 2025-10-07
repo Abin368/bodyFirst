@@ -4,7 +4,6 @@ import type { IOwnerGym, IOwnerProfile } from '@/types/owner'
 import { authStore } from './authStore'
 import type { GymFormValues } from '@/schemas/gym'
 
-
 class OwnerStore {
   gym: IOwnerGym | null = null
   profile: IOwnerProfile | null = null
@@ -69,13 +68,12 @@ class OwnerStore {
 
   //-------------------------------------------------
 
-  async handlePayment(stripePriceId:string) {
+  async handlePayment(stripePriceId: string) {
     this.loading = true
     this.error = null
     try {
-    const {checkoutUrl}= await OwnerService.handlePayment(stripePriceId)
-    setTimeout(() => window.location.href = checkoutUrl, 500)
-
+      const { checkoutUrl } = await OwnerService.handlePayment(stripePriceId)
+      setTimeout(() => (window.location.href = checkoutUrl), 500)
     } catch (err: any) {
       runInAction(() => {
         this.error = err.response?.data?.message || err.message || 'Payement Failes'
@@ -87,13 +85,17 @@ class OwnerStore {
       })
     }
   }
-//------------------------------------------
+  //------------------------------------------
   get subscriptionStatus(): 'ACTIVE' | 'INACTIVE' | 'EXPIRED' {
-    if(!this.profile?.subscriptionExpiry) return 'INACTIVE'
+    if (!this.profile) return 'INACTIVE'
+
+    if (this.profile.subscriptionStatus === 'INACTIVE') return 'INACTIVE'
+
+    if (!this.profile.subscriptionExpiry) return 'INACTIVE'
 
     const now = new Date()
-    const end= new Date(this.profile.subscriptionExpiry)
-    if(now>end) return 'EXPIRED'
+    const end = new Date(this.profile.subscriptionExpiry)
+    if (now > end) return 'EXPIRED'
     return 'ACTIVE'
   }
 

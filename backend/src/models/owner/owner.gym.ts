@@ -1,4 +1,4 @@
-import { IOwnerGym } from '../../interfaces/models/IOwnerGym'
+import { IOwnerGym } from '../../interfaces/models/owner/IOwnerGym'
 import { Schema, model } from 'mongoose'
 
 const OwnerGymSchema = new Schema<IOwnerGym>(
@@ -10,6 +10,11 @@ const OwnerGymSchema = new Schema<IOwnerGym>(
       pincode: { type: String, required: true },
       state: { type: String, required: true },
       street: { type: String, required: true },
+    },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'INACTIVE', 'EXPIRED'],
+      default: 'INACTIVE',
     },
     contactNo: { type: String },
     website: { type: String },

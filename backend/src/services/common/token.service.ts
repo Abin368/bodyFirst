@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-import { DecodedToken, ITokenService } from '../../interfaces/services/ITokenService'
+import { DecodedToken, ITokenService } from '../../interfaces/services/common/ITokenService'
 
 export default class TokenService implements ITokenService {
   generateAccessToken(payload: DecodedToken): string {

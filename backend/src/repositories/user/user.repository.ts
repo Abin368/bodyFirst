@@ -1,6 +1,6 @@
 import { injectable } from 'inversify'
-import { IUserRepository } from '../../interfaces/repository/IUserRepository'
-import { IUser } from '../../interfaces/models/IUser'
+import { IUserRepository } from '../../interfaces/repository/common/IUserRepository'
+import { IUser } from '../../interfaces/models/common/IUser'
 import User from '../../models/common/user.model'
 import { BaseRepository } from '../common/base.repository'
 import { AppError } from '../../errors/app.error'

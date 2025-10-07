@@ -7,17 +7,13 @@ const SuccessPayment = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const delay = (ms: number) => new Promise(res => setTimeout(res, ms))
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 
     const checkSubscription = async () => {
       try {
         ownerStore.loading = true
 
-       
-        await Promise.all([
-          ownerStore.fetchProfile(),
-          delay(3000) 
-        ])
+        await Promise.all([ownerStore.fetchProfile(), delay(3000)])
 
         if (ownerStore.isSubscribed) {
           navigate('/owner/dashboard')

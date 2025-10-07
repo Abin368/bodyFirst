@@ -1,7 +1,7 @@
 import { injectable } from 'inversify'
 import AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { IS3Repository } from '../../interfaces/repository/IS3Repository'
+import { IS3Repository } from '../../interfaces/repository/common/IS3Repository'
 import { AppError } from '../../errors/app.error'
 import { HttpStatus } from '../../enums/http.status'
 import { MESSAGES } from '../../enums/message.constant'

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
 import TYPES from '../di/types'
-import { IStripeWebhookService } from '../interfaces/services/IStripeWebhookService'
+import { IStripeWebhookService } from '../interfaces/services/stripe/IStripeWebhookService'
 import { HttpStatus } from '../enums/http.status'
 import { AppError } from '../errors/app.error'
 import { MESSAGES } from '../enums/message.constant'

@@ -7,8 +7,8 @@ import {
   ForgetPasswordVerifyOtpSchema,
   ResetPasswordSchema,
 } from '../dtos/auth/auth.dto'
-import { ITokenService } from '../interfaces/services/ITokenService'
-import { IAuthService } from '../interfaces/services/IAuthService'
+import { ITokenService } from '../interfaces/services/common/ITokenService'
+import { IAuthService } from '../interfaces/services/common/IAuthService'
 import { injectable, inject } from 'inversify'
 import TYPES from '../di/types'
 import { IAuthController } from '../interfaces/controllers/IAuthController'

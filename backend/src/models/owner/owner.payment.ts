@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IOwnerPayment } from '../../interfaces/models/IOwnerPayment'
+import { IOwnerPayment } from '../../interfaces/models/owner/IOwnerPayment'
 
 const OwnerPaymentSchema = new Schema<IOwnerPayment>(
   {
@@ -7,7 +7,7 @@ const OwnerPaymentSchema = new Schema<IOwnerPayment>(
 
     stripeSessionId: { type: String, index: true },
     stripePaymentIntentId: { type: String, index: true },
-    stripeEventId: { type: String, index: true, unique: true }, 
+    stripeEventId: { type: String, index: true, unique: true },
 
     amount: { type: Number, required: true },
     currency: { type: String, default: 'INR' },
@@ -17,8 +17,6 @@ const OwnerPaymentSchema = new Schema<IOwnerPayment>(
       enum: ['PENDING', 'SUCCESS', 'FAILED'],
       default: 'PENDING',
     },
-
-    
   },
   { timestamps: true }
 )

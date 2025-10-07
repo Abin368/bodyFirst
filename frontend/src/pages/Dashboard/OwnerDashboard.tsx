@@ -16,9 +16,9 @@ const OwnerDashboard = () => {
   }, [authStore.isAuthenticated])
 
   if (ownerStore.loading) {
-    return <LoadingOverlay/>
+    return <LoadingOverlay />
   }
-  
+
   return (
     <>
       <Header />

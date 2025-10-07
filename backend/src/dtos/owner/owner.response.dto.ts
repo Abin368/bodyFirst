@@ -96,13 +96,11 @@ export const UploadGymResponseSchema = z.object({
 
 export type UploadGymResponse = z.infer<typeof UploadGymResponseSchema>
 
-
 export const CheckoutPaymentResponseSchema = z.object({
   message: z.string(),
   data: z.object({
     checkoutUrl: z.string(),
   }),
-  
 })
 
 export type CheckoutPaymentResponseSchema = z.infer<typeof CheckoutPaymentResponseSchema>

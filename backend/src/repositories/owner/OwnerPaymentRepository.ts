@@ -1,6 +1,6 @@
-import { inject, injectable } from 'inversify'
-import { IOwnerPaymentRepository } from '../../interfaces/repository/IOwnerPaymentRepository'
-import { IOwnerPayment } from '../../interfaces/models/IOwnerPayment'
+import { injectable } from 'inversify'
+import { IOwnerPaymentRepository } from '../../interfaces/repository/owner/IOwnerPaymentRepository'
+import { IOwnerPayment } from '../../interfaces/models/owner/IOwnerPayment'
 import ownerPayment from '../../models/owner/owner.payment'
 import { BaseRepository } from '../common/base.repository'
 import { ClientSession } from 'mongoose'
@@ -14,7 +14,10 @@ export class OwnerPaymentRepository
     super(ownerPayment)
   }
 
-  async createPayment(payment: Partial<IOwnerPayment>, session?: ClientSession): Promise<IOwnerPayment> {
+  async createPayment(
+    payment: Partial<IOwnerPayment>,
+    session?: ClientSession
+  ): Promise<IOwnerPayment> {
     const doc = new this.model(payment)
     return await doc.save({ session })
   }

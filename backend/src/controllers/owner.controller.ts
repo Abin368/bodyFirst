@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { AuthRequest } from '../interfaces/user/auth-request.interface'
 import { inject, injectable } from 'inversify'
 import TYPES from '../di/types'
-import { IOwnerServices } from '../interfaces/services/IOwnerServices'
+import { IOwnerServices } from '../interfaces/services/owner/IOwnerServices'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
 import { IOwnerController } from '../interfaces/controllers/IOwnerController'
@@ -11,13 +11,13 @@ import {
   GetProfileResponseSchema,
   UploadImgResponseSchema,
   UploadGymResponseSchema,
-  CheckoutPaymentResponseSchema
+  CheckoutPaymentResponseSchema,
 } from '../dtos/owner/owner.response.dto'
 import { GymSchema, CheckoutPaymentSchema } from '../dtos/auth/owner.dtos'
 
 @injectable()
 export default class OwnerController implements IOwnerController {
-  constructor(@inject(TYPES.OwnerService) private readonly _ownerService: IOwnerServices) { }
+  constructor(@inject(TYPES.OwnerService) private readonly _ownerService: IOwnerServices) {}
 
   private getUserId(req: AuthRequest): string {
     const userId = req.user?.id
@@ -35,7 +35,7 @@ export default class OwnerController implements IOwnerController {
       data: profile,
     })
 
-   return res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //----------------------------------------------------
 
@@ -66,7 +66,7 @@ export default class OwnerController implements IOwnerController {
       data: newGym,
     })
 
-   return  res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //--------------------------------------------
 
@@ -76,13 +76,12 @@ export default class OwnerController implements IOwnerController {
     const { priceId } = CheckoutPaymentSchema.parse(req.body)
 
     const checkoutUrl = await this._ownerService.checkoutPayment(userId, priceId)
-    
+
     const response = CheckoutPaymentResponseSchema.parse({
       message: MESSAGES.OWNER.CHECKOUT_SUCCESS,
-      data: {checkoutUrl}
+      data: { checkoutUrl },
     })
 
     return res.status(HttpStatus.OK).json(response)
   }
-
 }

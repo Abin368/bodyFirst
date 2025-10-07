@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import TYPES from '../../di/types'
-import { IS3Repository } from '../../interfaces/repository/IS3Repository'
-import { IImageService } from '../../interfaces/services/IImageService'
+import { IS3Repository } from '../../interfaces/repository/common/IS3Repository'
+import { IImageService } from '../../interfaces/services/common/IImageService'
 
 @injectable()
 export class ImageService implements IImageService {

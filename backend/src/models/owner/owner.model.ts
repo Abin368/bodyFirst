@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IOwnerProfile } from '../../interfaces/models/IOwnerProfile'
+import { IOwnerProfile } from '../../interfaces/models/owner/IOwnerProfile'
 
 const OwnerProfileSchema = new Schema<IOwnerProfile>(
   {
@@ -32,7 +32,6 @@ const OwnerProfileSchema = new Schema<IOwnerProfile>(
 
     lastPaymentId: { type: Schema.Types.ObjectId, ref: 'OwnerPayment' },
 
-  
     stripeCustomerId: { type: String, index: true },
     stripeSubscriptionId: { type: String, index: true },
     stripePriceId: { type: String },

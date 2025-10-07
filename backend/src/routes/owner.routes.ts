@@ -12,7 +12,6 @@ const router = Router()
 const upload = multer()
 const ownerController = container.get<OwnerController>(TYPES.OwnerController)
 
-
 router.get(ROUTES.OWNER.PROFILE_ME, authMiddleware, asyncHandler(ownerController.getProfile))
 router.post(
   ROUTES.OWNER.UPLOAD_IMG,
@@ -23,6 +22,10 @@ router.post(
   asyncHandler(ownerController.uploadImg)
 )
 router.post(ROUTES.OWNER.SUBMIT_GYM, authMiddleware, asyncHandler(ownerController.uploadGym))
-router.post(ROUTES.OWNER.CREATE_CHECKOUT_SESSION,authMiddleware,asyncHandler(ownerController.paymentCheckout))
+router.post(
+  ROUTES.OWNER.CREATE_CHECKOUT_SESSION,
+  authMiddleware,
+  asyncHandler(ownerController.paymentCheckout)
+)
 
 export default router

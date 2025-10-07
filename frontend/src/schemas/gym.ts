@@ -2,7 +2,7 @@ import z from 'zod'
 
 export const GymSchema = z.object({
   name: z.string().min(2, 'Gym name required'),
-  contactNo: z.string().min(10, 'Invalid Cuntact number'),
+  contactNo: z.string().min(10, 'Invalid Contact number'),
   website: z.string().optional(),
   address: z.object({
     city: z.string(),
@@ -61,7 +61,7 @@ export const UploadGymResponseSchema = z.object({
         createdAt: z.string(),
         updatedAt: z.string(),
       })
-      .nullable(), // profile can be null initially
+      .nullable(),
   }),
 })
 

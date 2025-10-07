@@ -1,4 +1,4 @@
-import { Model, Document, SaveOptions } from 'mongoose'
+import { Model, Document, SaveOptions, FilterQuery, UpdateQuery, ClientSession } from 'mongoose'
 import { AppError } from '../../errors/app.error'
 import { HttpStatus } from '../../enums/http.status'
 
@@ -17,6 +17,33 @@ export abstract class BaseRepository<T extends Document> {
       )
     }
   }
+  //-----------------------------------------------
+  async find(filter: FilterQuery<T> = {}, session?: ClientSession): Promise<T[]> {
+    try {
+      const query = this.model.find(filter)
+      if (session) query.session(session)
+      return await query.lean<T[]>().exec()
+    } catch (error: any) {
+      throw new AppError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        `Error finding documents: ${error.message}`
+      )
+    }
+  }
+
+  //-----------------------------------------------
+  async findOne(filter: FilterQuery<T>, session?: ClientSession): Promise<T | null> {
+    try {
+      const query = this.model.findOne(filter)
+      if (session) query.session(session)
+      return await query.lean<T>().exec()
+    } catch (error: any) {
+      throw new AppError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        `Error finding document: ${error.message}`
+      )
+    }
+  }
 
   //------------------------------------
   async findById(id: string): Promise<T | null> {
@@ -29,6 +56,7 @@ export abstract class BaseRepository<T extends Document> {
       )
     }
   }
+
   //----------------------------------------
   async update(id: string, updateData: Partial<T>): Promise<T | null> {
     try {
@@ -37,6 +65,23 @@ export abstract class BaseRepository<T extends Document> {
       throw new AppError(
         HttpStatus.INTERNAL_SERVER_ERROR,
         `Error updating document: ${error.message}`
+      )
+    }
+  }
+
+  //-----------------------------------------
+  async updateMany(
+    filter: FilterQuery<T>,
+    update: UpdateQuery<Partial<T>>,
+    session?: ClientSession
+  ): Promise<{ acknowledged: boolean; modifiedCount: number }> {
+    try {
+      const result = await this.model.updateMany(filter, update, { session })
+      return { acknowledged: result.acknowledged, modifiedCount: result.modifiedCount }
+    } catch (error: any) {
+      throw new AppError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        `Error updating multiple documents: ${error.message}`
       )
     }
   }

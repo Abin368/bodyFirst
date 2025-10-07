@@ -1,6 +1,6 @@
 import { injectable } from 'inversify'
 import bcrypt from 'bcryptjs'
-import { IPasswordService } from '../../interfaces/services/IPasswordService'
+import { IPasswordService } from '../../interfaces/services/common/IPasswordService'
 
 @injectable()
 export default class PasswordService implements IPasswordService {

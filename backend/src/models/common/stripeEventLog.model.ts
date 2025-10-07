@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IStripeEventLog } from '../../interfaces/models/IStripeEventLog'
-
+import { IStripeEventLog } from '../../interfaces/models/common/IStripeEventLog'
 
 const StripeEventLogSchema = new Schema<IStripeEventLog>(
   {
