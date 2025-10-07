@@ -31,6 +31,7 @@ export interface IOwnerGym {
     street: string
     pincode: string
   }
+  status: 'ACTIVE' | 'INACTIVE' | 'EXPIRED'
   contactNo?: string
   website?: string
   logoUrl?: string

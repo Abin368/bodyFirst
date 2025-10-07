@@ -1,130 +1,137 @@
+import { injectable, inject } from 'inversify';
+import Stripe from 'stripe';
+import mongoose from 'mongoose';
+import TYPES from '../../di/types';
+import logger from '../../utils/logger';
+import { IOwnerProfileRepository } from '../../interfaces/repository/IOwnerProfileRepository';
+import { IOwnerPaymentRepository } from '../../interfaces/repository/IOwnerPaymentRepository';
+import { IStripeEventLogRepository } from '../../interfaces/repository/IStripeEventLogRepository';
+import { IStripeWebhookService } from '../../interfaces/services/IStripeWebhookService';
+import { AppError } from '../../errors/app.error';
+import { HttpStatus } from '../../enums/http.status';
+import { StripeEventStatus, SubscriptionStatus } from '../../enums/stripe.enums';
 
-import { inject, injectable } from 'inversify'
-import { IOwnerServices, GymCreateDTO } from '../interfaces/services/IOwnerServices'
-import { IOwnerProfileRepository } from '../interfaces/repository/IOwnerProfileRepository'
-import TYPES from '../di/types'
-import { IOwnerProfile } from '../interfaces/models/IOwnerProfile'
-import { AppError } from '../errors/app.error'
-import { HttpStatus } from '../enums/http.status'
-import { MESSAGES } from '../enums/message.constant'
-import { IUserRepository } from '../interfaces/repository/IUserRepository'
-import { IS3Repository } from '../interfaces/repository/IS3Repository'
-import { GymSchema } from '../dtos/owner.dtos'
-import mongoose from 'mongoose'
-import { IOwnerGymRepository } from '../interfaces/repository/IOwnerGymRepository'
-import { IOwnerGym } from '../interfaces/models/IOwnerGym'
-import { IImageService } from '../interfaces/services/IImageService'
+type EventHandler = (event: Stripe.Event) => Promise<void>;
 
 @injectable()
-export default class OwnerService implements IOwnerServices {
+export class StripeWebhookService implements IStripeWebhookService {
+  private handlers: Record<string, EventHandler>;
+
   constructor(
-    @inject(TYPES.OwnerProfileRepository) private readonly _ownerProfileRepository: IOwnerProfileRepository,
-    @inject(TYPES.UserRepository) private readonly _userRepository: IUserRepository,
-    @inject(TYPES.S3Repository) private readonly _s3Repository: IS3Repository,
-    @inject(TYPES.OwnerGymRepository) private readonly _ownerGymRepository: IOwnerGymRepository,
-    @inject(TYPES.ImageService) private readonly _imageService: IImageService,
-  ) { }
-
-
-  private async createGymEntity(ownerId: mongoose.Types.ObjectId, gymData: GymSchema, images: string[], session: mongoose.ClientSession) {
-    return await this._ownerGymRepository.create({ ownerId, ...gymData, images }, { session })
+    @inject(TYPES.StripeClient) private readonly stripe: Stripe,
+    @inject(TYPES.OwnerProfileRepository) private readonly ownerProfileRepo: IOwnerProfileRepository,
+    @inject(TYPES.OwnerPaymentRepository) private readonly ownerPaymentRepo: IOwnerPaymentRepository,
+    @inject(TYPES.StripeEventLogRepository) private readonly eventLogRepo: IStripeEventLogRepository
+  ) {
+    this.handlers = {
+      'checkout.session.completed': this.handleCheckoutSessionCompleted.bind(this),
+      'payment_intent.payment_failed': this.handlePaymentFailed.bind(this),
+    };
   }
 
-  private async ensureProfileExists(userId: string, gymId: mongoose.Types.ObjectId, gymData: GymSchema, session: mongoose.ClientSession) {
-    let profile = await this._ownerProfileRepository.findByUserId(userId)
-    if (!profile) {
-      profile = await this._ownerProfileRepository.create(
-        { userId: new mongoose.Types.ObjectId(userId), gymId, contactNo: gymData.contactNo, website: gymData.website },
-        { session }
-      )
-    }
-    return profile
-  }
-  //--------------------------------------
-  async getProfileByUserId(userId: string): Promise<IOwnerProfile> {
-    const profile = await this._ownerProfileRepository.findByUserId(userId)
-    if (!profile) {
-      throw new AppError(HttpStatus.NOT_FOUND, MESSAGES.USER.NOT_FOUND)
-    }
-    return profile 
-  }
-  //---------------------------------------
-
-  async uploadGymImage(ownerId: string, file: Express.Multer.File): Promise<{ key: string; url: string }> {
-    const owner = await this._userRepository.findById(ownerId)
-    if (!owner) throw new AppError(HttpStatus.NOT_FOUND, MESSAGES.USER.NOT_FOUND)
-    if (owner.role !== 'owner') throw new AppError(HttpStatus.UNAUTHORIZED, MESSAGES.AUTH.UNAUTHORIZED)
-
-    const {key,url} = await this._s3Repository.uploadFile(ownerId, file.buffer, file.mimetype)
-    return {key,url}
-  }
-
-  //------------------------------------------
-
-  async createGym(userId:string,gymData:GymSchema & { tempImageKey?: string }):Promise<{gym:IOwnerGym,profile:IOwnerProfile}>{
-   
-    const ownerObjectId  = new mongoose.Types.ObjectId(userId);
-  
-    const finalImages = await this._imageService.handleGymImages(
-      gymData.tempImageKey,
-      gymData.images,
-      userId
-    )
-
-    const session= await mongoose.startSession()
-   
+  async handleWebhook(body: Buffer, signature: string): Promise<void> {
+    let event: Stripe.Event;
     try {
-     
-      session.startTransaction();
-      // const gym = await this._ownerGymRepository.create(
-      //   {
-      //     ownerId: mongoUserId,
-      //     name: gymData.name,
-      //     address: gymData.address,
-      //     contactNo: gymData.contactNo,
-      //     website: gymData.website,
-      //     images: finalImages
-      //   },
-      //   { session }
-      // )
-      
-    
-      // let profile = await this._ownerProfileRepository.findByUserId(userId)
-    
-    
-      // if (!profile) {
-        
-      //   profile = await this._ownerProfileRepository.create(
-      //     {
-      //       userId: mongoUserId,
-      //       gymId: gym._id,
-      //       contactNo: gymData.contactNo,
-      //       website: gymData.website
-      //     },
-      //     { session }
-      //   )
-       
-      // } 
-
-      const gym = await this.createGymEntity(ownerObjectId, gymData, finalImages, session)
-      const profile = await this.ensureProfileExists(userId, gym._id, gymData, session)
-
-      
-      await session.commitTransaction()
-    
-      return { gym, profile }
-    } catch (error) {
-      await session.abortTransaction()
-      throw new AppError(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        MESSAGES.OWNER.GYM_CREATION_FAILED
-      )
-    }finally{
-      session.endSession()
+      event = this.stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET as string
+      );
+    } catch (err: any) {
+      logger.error('Stripe signature verification failed', { err });
+      throw new AppError(HttpStatus.BAD_REQUEST, 'Invalid Stripe signature');
     }
-  }    
 
+    const isNewEvent = await this.eventLogRepo.createIfNotExists(event.id, event.type, StripeEventStatus.PROCESSING);
+    if (!isNewEvent) {
+      logger.warn('Duplicate Stripe event received', { eventId: event.id });
+      return;
+    }
 
+    const handler = this.handlers[event.type];
+    if (!handler) {
+      logger.info('Unhandled Stripe event', { eventId: event.id, type: event.type });
+      await this.eventLogRepo.updateStatus(event.id, StripeEventStatus.SUCCESS);
+      return;
+    }
 
+    try {
+      await handler(event);
+      await this.eventLogRepo.updateStatus(event.id, StripeEventStatus.SUCCESS);
+    } catch (err) {
+      logger.error('Error processing Stripe event', { eventId: event.id, err });
+      await this.eventLogRepo.updateStatus(
+        event.id,
+        StripeEventStatus.FAILED,
+        err instanceof Error ? err.message : String(err)
+      );
+      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to process Stripe event');
+    }
+  }
 
+  private async handleCheckoutSessionCompleted(event: Stripe.Event): Promise<void> {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const ownerId = session.metadata?.ownerId;
+    if (!ownerId) {
+      logger.warn('Checkout session missing ownerId', { eventId: event.id });
+      return;
+    }
+
+    const dbSession = await mongoose.startSession();
+    dbSession.startTransaction();
+
+    try {
+      const profile = await this.ownerProfileRepo.findByUserId(ownerId);
+      if (!profile) throw new Error(`Owner profile not found for ownerId: ${ownerId}`);
+
+      await this.ownerPaymentRepo.createPayment({
+        ownerId: profile._id,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent as string,
+        stripeEventId: event.id,
+        amount: ((session.amount_total ?? 0) / 100),
+        currency: (session.currency ?? 'INR').toUpperCase(),
+        status: StripeEventStatus.SUCCESS,
+      }, dbSession);
+
+      await this.ownerProfileRepo.updateByUserId(ownerId, {
+        subscriptionStatus: SubscriptionStatus.ACTIVE,
+        subscriptionStart: new Date(),
+        stripeCustomerId: session.customer as string,
+        stripePriceId: session.metadata?.priceId,
+      }, dbSession);
+
+      await dbSession.commitTransaction();
+      logger.info('Checkout session processed successfully', { ownerId, sessionId: session.id, eventId: event.id });
+    } catch (err) {
+      await dbSession.abortTransaction();
+      logger.error('Failed processing checkout session', { err, eventId: event.id });
+      throw err;
+    } finally {
+      dbSession.endSession();
+    }
+  }
+
+  private async handlePaymentFailed(event: Stripe.Event): Promise<void> {
+    const intent = event.data.object as Stripe.PaymentIntent;
+    const ownerId = intent.metadata?.ownerId;
+    if (!ownerId) {
+      logger.warn('Payment intent failed without ownerId', { eventId: event.id });
+      return;
+    }
+
+    try {
+      await this.ownerPaymentRepo.createPayment({
+        ownerId: new mongoose.Types.ObjectId(ownerId),
+        stripePaymentIntentId: intent.id,
+        stripeEventId: event.id,
+        amount: ((intent.amount ?? 0) / 100),
+        currency: (intent.currency ?? 'INR').toUpperCase(),
+        status: StripeEventStatus.FAILED,
+      });
+      logger.info('Failed payment recorded', { ownerId, eventId: event.id });
+    } catch (err) {
+      logger.error('Failed to record payment failure', { err, eventId: event.id });
+    }
+  }
 }

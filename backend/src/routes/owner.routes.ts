@@ -6,6 +6,7 @@ import OwnerController from '../controllers/owner.controller'
 import TYPES from '../di/types'
 import { asyncHandler } from '../utils/async.handler'
 import { ROUTES } from '../enums/routes.constant'
+import { restricedFileUpload } from '../middlewares/restricted.file.uploads'
 
 const router = Router()
 const upload = multer()
@@ -15,8 +16,16 @@ router.get(ROUTES.OWNER.PROFILE_ME, authMiddleware, asyncHandler(ownerController
 router.post(
   ROUTES.OWNER.UPLOAD_IMG,
   authMiddleware,
+
   upload.single('file'),
+  restricedFileUpload,
   asyncHandler(ownerController.uploadImg)
 )
 router.post(ROUTES.OWNER.SUBMIT_GYM, authMiddleware, asyncHandler(ownerController.uploadGym))
+router.post(
+  ROUTES.OWNER.CREATE_CHECKOUT_SESSION,
+  authMiddleware,
+  asyncHandler(ownerController.paymentCheckout)
+)
+
 export default router

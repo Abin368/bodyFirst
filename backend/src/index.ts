@@ -9,11 +9,15 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import authRoutes from './routes/auth.routes'
 import ownerRoutes from './routes/owner.routes'
+import gymRoutes from './routes/gym.routes'
+import memberRoutes from './routes/member.routes'
+import webhookRoutes from './routes/wehbook.routes'
 import { connectDB } from './config/db'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middlewares/error.handler'
 import morgan from 'morgan'
 import logger from './utils/logger'
+import { subscriptionExpiryCron } from './cron/subscriptionExpiry'
 
 const app = express()
 const PORT = process.env.PORT || 8000
@@ -61,7 +65,7 @@ app.use(
     message: 'Too many requests, please try again later.',
   })
 )
-
+app.use(webhookRoutes)
 app.use(express.json())
 app.use(cookieParser())
 
@@ -87,6 +91,8 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/owner', ownerRoutes)
+app.use('/api/gym', gymRoutes)
+app.use('/api/member', memberRoutes)
 
 app.get('/', (req, res) => {
   res.send('Backend is running ')
@@ -106,6 +112,8 @@ async function startServer() {
 
     await connectRedis()
     console.log('✅ Redis connected')
+
+    subscriptionExpiryCron()
 
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
   } catch (error) {

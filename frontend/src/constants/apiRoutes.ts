@@ -17,5 +17,14 @@ export const API_ROUTES = {
     PROFILE_ME: '/owner/profile/me',
     UPLOAD_IMG: '/owner/gym/upload-image',
     FINALIZE_GYM: '/owner/gym/finalize',
+    CREATE_CHECKOUT_SESSION: '/owner/stripe/create-checkout-session',
+  },
+  MEMBER: {
+    PROFILE_ME: '/member/profile/me',
+    UPLOAD_IMG: '/member/gym/upload-image',
+    FINALIZE_GYM: '/member/profile/finalize',
+  },
+  GYM: {
+    GET_GYM: '/gym/complete/list',
   },
 }

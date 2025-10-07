@@ -12,6 +12,19 @@ const TYPES = {
   S3Repository: Symbol.for('S3Repository'),
   OwnerGymRepository: Symbol.for('OwnerGymRepository'),
   ImageService: Symbol.for('ImageService'),
+  StripeServices: Symbol.for('StripeServices'),
+  StripeWebhookService: Symbol.for('StripeWebhookService'),
+  StripeWebhookController: Symbol.for('StripeWebhookController'),
+  OwnerPaymentRepository: Symbol.for('OwnerPaymentRepository'),
+  StripeClient: Symbol.for('StripeClient'),
+  StripeEventLogRepository: Symbol.for('StripeEventLogRepository'),
+  SubscriptionService: Symbol.for('SubscriptionService'),
+  MemberController: Symbol.for('MemberController'),
+  MemberService: Symbol.for('MemberService'),
+  MemberRepository: Symbol.for('MemberRepository'),
+  GymController: Symbol.for('GymController'),
+  GymService: Symbol.for('GymService'),
+  GymRepository: Symbol.for('GymRepository'),
 }
 
 export default TYPES

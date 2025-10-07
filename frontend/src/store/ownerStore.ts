@@ -66,8 +66,37 @@ class OwnerStore {
     }
   }
 
+  //-------------------------------------------------
+
+  async handlePayment(stripePriceId: string) {
+    this.loading = true
+    this.error = null
+    try {
+      const { checkoutUrl } = await OwnerService.handlePayment(stripePriceId)
+      setTimeout(() => (window.location.href = checkoutUrl), 500)
+    } catch (err: any) {
+      runInAction(() => {
+        this.error = err.response?.data?.message || err.message || 'Payement Failes'
+      })
+      throw err
+    } finally {
+      runInAction(() => {
+        this.loading = false
+      })
+    }
+  }
+  //------------------------------------------
   get subscriptionStatus(): 'ACTIVE' | 'INACTIVE' | 'EXPIRED' {
-    return this.profile?.subscriptionStatus || 'INACTIVE'
+    if (!this.profile) return 'INACTIVE'
+
+    if (this.profile.subscriptionStatus === 'INACTIVE') return 'INACTIVE'
+
+    if (!this.profile.subscriptionExpiry) return 'INACTIVE'
+
+    const now = new Date()
+    const end = new Date(this.profile.subscriptionExpiry)
+    if (now > end) return 'EXPIRED'
+    return 'ACTIVE'
   }
 
   get isSubscribed(): boolean {

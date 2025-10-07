@@ -14,11 +14,10 @@ import { OwnerService } from '@/services/ownerService'
 import { Toast } from '@/components/common/Toast'
 import LoadingOverlay from '@/components/common/LoadingOverlay'
 
-
 const CreateGym = observer(() => {
   const [loading, setLoading] = useState<boolean>(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
- 
+
   const [cropModalOpen, setCropModalOpen] = useState<boolean>(false)
   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState<number>(1)

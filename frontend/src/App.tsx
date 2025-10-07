@@ -1,6 +1,7 @@
 import AppRoutes from './routes/AppRoutes'
 import { authStore } from './store/authStore'
 import { useEffect } from 'react'
+import MemberRoutes from './routes/MemberRoutes'
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -10,6 +11,7 @@ const App: React.FC = () => {
   return (
     <>
       <AppRoutes />
+      <MemberRoutes />
     </>
   )
 }

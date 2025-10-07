@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { AuthRequest } from '../interfaces/user/auth-request.interface'
 import { inject, injectable } from 'inversify'
 import TYPES from '../di/types'
-import { IOwnerServices } from '../interfaces/services/IOwnerServices'
+import { IOwnerServices } from '../interfaces/services/owner/IOwnerServices'
 import { AppError } from '../errors/app.error'
 import { HttpStatus } from '../enums/http.status'
 import { IOwnerController } from '../interfaces/controllers/IOwnerController'
@@ -11,8 +11,9 @@ import {
   GetProfileResponseSchema,
   UploadImgResponseSchema,
   UploadGymResponseSchema,
-} from '../dtos/owner.response.dto'
-import { GymSchema } from '../dtos/owner.dtos'
+  CheckoutPaymentResponseSchema,
+} from '../dtos/owner/owner.response.dto'
+import { GymSchema, CheckoutPaymentSchema } from '../dtos/auth/owner.dtos'
 
 @injectable()
 export default class OwnerController implements IOwnerController {
@@ -24,7 +25,7 @@ export default class OwnerController implements IOwnerController {
     return userId
   }
   //--------------------------------------------
-  getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  getProfile = async (req: AuthRequest, res: Response): Promise<Response> => {
     const userId = this.getUserId(req)
 
     const profile = await this._ownerService.getProfileByUserId(userId)
@@ -34,11 +35,11 @@ export default class OwnerController implements IOwnerController {
       data: profile,
     })
 
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
   //----------------------------------------------------
 
-  uploadImg = async (req: AuthRequest, res: Response): Promise<void> => {
+  uploadImg = async (req: AuthRequest, res: Response): Promise<Response> => {
     const ownerId = this.getUserId(req)
 
     const file = req.file
@@ -52,11 +53,11 @@ export default class OwnerController implements IOwnerController {
       url,
     })
 
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
   }
 
   //-----------------------------------------
-  uploadGym = async (req: AuthRequest, res: Response): Promise<void> => {
+  uploadGym = async (req: AuthRequest, res: Response): Promise<Response> => {
     const userId = this.getUserId(req)
     const gymData = GymSchema.parse(req.body)
     const newGym = await this._ownerService.createGym(userId, gymData)
@@ -65,6 +66,22 @@ export default class OwnerController implements IOwnerController {
       data: newGym,
     })
 
-    res.status(HttpStatus.OK).json(response)
+    return res.status(HttpStatus.OK).json(response)
+  }
+  //--------------------------------------------
+
+  paymentCheckout = async (req: AuthRequest, res: Response): Promise<Response> => {
+    const userId = this.getUserId(req)
+
+    const { priceId } = CheckoutPaymentSchema.parse(req.body)
+
+    const checkoutUrl = await this._ownerService.checkoutPayment(userId, priceId)
+
+    const response = CheckoutPaymentResponseSchema.parse({
+      message: MESSAGES.OWNER.CHECKOUT_SUCCESS,
+      data: { checkoutUrl },
+    })
+
+    return res.status(HttpStatus.OK).json(response)
   }
 }
