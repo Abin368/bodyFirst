@@ -1,137 +1,93 @@
-import { injectable, inject } from 'inversify';
-import Stripe from 'stripe';
-import mongoose from 'mongoose';
-import TYPES from '../../di/types';
-import logger from '../../utils/logger';
-import { IOwnerProfileRepository } from '../../interfaces/repository/IOwnerProfileRepository';
-import { IOwnerPaymentRepository } from '../../interfaces/repository/IOwnerPaymentRepository';
-import { IStripeEventLogRepository } from '../../interfaces/repository/IStripeEventLogRepository';
-import { IStripeWebhookService } from '../../interfaces/services/IStripeWebhookService';
-import { AppError } from '../../errors/app.error';
-import { HttpStatus } from '../../enums/http.status';
-import { StripeEventStatus, SubscriptionStatus } from '../../enums/stripe.enums';
+'use client'
 
-type EventHandler = (event: Stripe.Event) => Promise<void>;
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
+import { gymStore } from '@/store/gymStore'
 
-@injectable()
-export class StripeWebhookService implements IStripeWebhookService {
-  private handlers: Record<string, EventHandler>;
+import LoadingOverlay from '@/components/common/LoadingOverlay'
+import { motion } from 'framer-motion'
+import GymCard from '@/components/common/GymCard'
+import useDebounce from '@/hooks/useDebounce'
+import { Search,Dumbbell } from 'lucide-react'
 
-  constructor(
-    @inject(TYPES.StripeClient) private readonly stripe: Stripe,
-    @inject(TYPES.OwnerProfileRepository) private readonly ownerProfileRepo: IOwnerProfileRepository,
-    @inject(TYPES.OwnerPaymentRepository) private readonly ownerPaymentRepo: IOwnerPaymentRepository,
-    @inject(TYPES.StripeEventLogRepository) private readonly eventLogRepo: IStripeEventLogRepository
-  ) {
-    this.handlers = {
-      'checkout.session.completed': this.handleCheckoutSessionCompleted.bind(this),
-      'payment_intent.payment_failed': this.handlePaymentFailed.bind(this),
-    };
+const GymList = observer(() => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm,300)
+
+  useEffect(()=>{
+    gymStore.setSearch(debouncedSearch)
+  },[debouncedSearch])
+
+  useEffect(() => {
+    gymStore.fetchGyms()
+  }, [])
+
+  if (gymStore.loading) return <LoadingOverlay />
+
+  const filteredGyms = gymStore.filteredGyms || []
+
+  if (gymStore.error) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center shadow-lg">
+            <span className="text-red-600 text-2xl">⚠️</span>
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 mb-2">Unable to Load Gyms</h3>
+          <p className="text-slate-600">{gymStore.error}</p>
+        </div>
+      </div>
+    )
   }
 
-  async handleWebhook(body: Buffer, signature: string): Promise<void> {
-    let event: Stripe.Event;
-    try {
-      event = this.stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET as string
-      );
-    } catch (err: any) {
-      logger.error('Stripe signature verification failed', { err });
-      throw new AppError(HttpStatus.BAD_REQUEST, 'Invalid Stripe signature');
-    }
 
-    const isNewEvent = await this.eventLogRepo.createIfNotExists(event.id, event.type, StripeEventStatus.PROCESSING);
-    if (!isNewEvent) {
-      logger.warn('Duplicate Stripe event received', { eventId: event.id });
-      return;
-    }
+  
 
-    const handler = this.handlers[event.type];
-    if (!handler) {
-      logger.info('Unhandled Stripe event', { eventId: event.id, type: event.type });
-      await this.eventLogRepo.updateStatus(event.id, StripeEventStatus.SUCCESS);
-      return;
-    }
+  return (
+    <section className="relative px-4 py-16 md:py-20 bg-gradient-to-br">
+      {/* Header + Search */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center max-w-3xl mx-auto mb-10 px-4"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-xs md:text-sm mb-4 shadow-lg">
+          <Dumbbell className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="tracking-wide uppercase">Find Your Fitness Hub</span>
+        </div>
+        <h2 className="text-3xl md:text-5xl font-light tracking-tight text-slate-900 mb-3">
+          Choose Your{' '}
+          <span className="font-bold bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent">
+            Perfect Gym
+          </span>
+        </h2>
+        <p className="text-base md:text-lg text-slate-600 leading-relaxed">
+          Discover premium gyms with top-tier facilities, expert trainers, and the perfect vibe to push your limits.
+        </p>
 
-    try {
-      await handler(event);
-      await this.eventLogRepo.updateStatus(event.id, StripeEventStatus.SUCCESS);
-    } catch (err) {
-      logger.error('Error processing Stripe event', { eventId: event.id, err });
-      await this.eventLogRepo.updateStatus(
-        event.id,
-        StripeEventStatus.FAILED,
-        err instanceof Error ? err.message : String(err)
-      );
-      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to process Stripe event');
-    }
-  }
+        {/* Search Bar */}
+        <div className="mt-8 relative max-w-md mx-auto">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search gyms..."
+            className="w-full pl-12 pr-4 py-3 rounded-full border border-indigo-200 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-400 focus:outline-none shadow-sm transition-all"
+          />
+          <Search className="w-5 h-5 text-indigo-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+      </motion.div>
 
-  private async handleCheckoutSessionCompleted(event: Stripe.Event): Promise<void> {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const ownerId = session.metadata?.ownerId;
-    if (!ownerId) {
-      logger.warn('Checkout session missing ownerId', { eventId: event.id });
-      return;
-    }
+      {/* Grid of Cards */}
+    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto'>
+      {filteredGyms.length ===0 ?(
+        <p className='text-center text-slate-500 col-span-full'> No gyms found matching your search</p>
+      ):(
+        filteredGyms.map((gym,index)=><GymCard key={gym._id} gym={gym} index={index}></GymCard>)
+      )}
+    </div>
+    </section>
+  )
+})
 
-    const dbSession = await mongoose.startSession();
-    dbSession.startTransaction();
-
-    try {
-      const profile = await this.ownerProfileRepo.findByUserId(ownerId);
-      if (!profile) throw new Error(`Owner profile not found for ownerId: ${ownerId}`);
-
-      await this.ownerPaymentRepo.createPayment({
-        ownerId: profile._id,
-        stripeSessionId: session.id,
-        stripePaymentIntentId: session.payment_intent as string,
-        stripeEventId: event.id,
-        amount: ((session.amount_total ?? 0) / 100),
-        currency: (session.currency ?? 'INR').toUpperCase(),
-        status: StripeEventStatus.SUCCESS,
-      }, dbSession);
-
-      await this.ownerProfileRepo.updateByUserId(ownerId, {
-        subscriptionStatus: SubscriptionStatus.ACTIVE,
-        subscriptionStart: new Date(),
-        stripeCustomerId: session.customer as string,
-        stripePriceId: session.metadata?.priceId,
-      }, dbSession);
-
-      await dbSession.commitTransaction();
-      logger.info('Checkout session processed successfully', { ownerId, sessionId: session.id, eventId: event.id });
-    } catch (err) {
-      await dbSession.abortTransaction();
-      logger.error('Failed processing checkout session', { err, eventId: event.id });
-      throw err;
-    } finally {
-      dbSession.endSession();
-    }
-  }
-
-  private async handlePaymentFailed(event: Stripe.Event): Promise<void> {
-    const intent = event.data.object as Stripe.PaymentIntent;
-    const ownerId = intent.metadata?.ownerId;
-    if (!ownerId) {
-      logger.warn('Payment intent failed without ownerId', { eventId: event.id });
-      return;
-    }
-
-    try {
-      await this.ownerPaymentRepo.createPayment({
-        ownerId: new mongoose.Types.ObjectId(ownerId),
-        stripePaymentIntentId: intent.id,
-        stripeEventId: event.id,
-        amount: ((intent.amount ?? 0) / 100),
-        currency: (intent.currency ?? 'INR').toUpperCase(),
-        status: StripeEventStatus.FAILED,
-      });
-      logger.info('Failed payment recorded', { ownerId, eventId: event.id });
-    } catch (err) {
-      logger.error('Failed to record payment failure', { err, eventId: event.id });
-    }
-  }
-}
+export default GymList

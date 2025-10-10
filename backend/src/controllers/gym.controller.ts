@@ -17,10 +17,15 @@ export default class GymController extends BaseController implements IGymControl
 
   //--------------------------------------------------
   getGyms = async (req: AuthRequest, res: Response): Promise<Response> => {
-    const gyms = await this._gymService.getActiveGyms()
+    const { search = '', page = '1', limit = '12' } = req.query as Record<string, string>
+
+    const result = await this._gymService.getActiveGyms(search, Number(page), Number(limit))
     const response = GymListResponseSchema.parse({
       message: MESSAGES.GYM.FETCHED_SUCCESSFULLY,
-      data: gyms,
+      data: result.gyms,
+      total: result.totalGyms,
+      page: result.currentPage,
+      totalPages: result.totalPages,
     })
     return res.status(HttpStatus.OK).json(response)
   }

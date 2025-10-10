@@ -1,6 +1,12 @@
 import { Model, Document, SaveOptions, FilterQuery, UpdateQuery, ClientSession } from 'mongoose'
 import { AppError } from '../../errors/app.error'
 import { HttpStatus } from '../../enums/http.status'
+import { MESSAGES } from '../../enums/message.constant'
+
+export interface PaginationOptions {
+  page?: number
+  limit?: number
+}
 
 export abstract class BaseRepository<T extends Document> {
   constructor(protected model: Model<T>) {}
@@ -9,7 +15,8 @@ export abstract class BaseRepository<T extends Document> {
   async create(data: Partial<T>, options?: SaveOptions): Promise<T> {
     try {
       const doc = new this.model(data)
-      return await doc.save(options)
+      const saved = await doc.save(options)
+      return saved.toObject() as T
     } catch (error: any) {
       throw new AppError(
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -98,4 +105,39 @@ export abstract class BaseRepository<T extends Document> {
     }
   }
   //--------------------------------------------------------
+  async findByFilter(filter: FilterQuery<T> = {}): Promise<T[]> {
+    return this.model.find(filter)
+  }
+
+  async searchWithPagination(
+    baseFilter: FilterQuery<T>,
+    searchTerm: string,
+    page: number = 1,
+    limit: number = 12,
+    searchableFields: string[] = []
+  ): Promise<{ data: T[]; total: number; totalPages: number; currentPage: number }> {
+    try {
+      const skip = (page - 1) * limit
+      const searchFilter =
+        searchTerm && searchableFields.length > 0
+          ? {
+              $or: searchableFields.map((field) => ({
+                [field]: { $regex: searchTerm, $options: 'i' },
+              })),
+            }
+          : {}
+
+      const query = { ...baseFilter, ...searchFilter }
+
+      const [data, total] = await Promise.all([
+        this.model.find(query).skip(skip).limit(limit),
+        this.model.countDocuments(query),
+      ])
+
+      const totalPages = Math.ceil(total / limit) || 1
+      return { data, total, totalPages, currentPage: page }
+    } catch {
+      throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGES.COMMON.FAILED)
+    }
+  }
 }

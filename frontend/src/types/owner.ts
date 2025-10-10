@@ -9,9 +9,12 @@ export interface OwnerProfile {
 }
 
 export interface ApiResponse<T> {
-  success: boolean
+  success?: boolean
   message: string
   data: T
+  total?: number
+  page?: number
+  totalPages?: number
 }
 
 export interface CroppedAreaPixels {

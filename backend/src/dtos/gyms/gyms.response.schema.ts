@@ -26,9 +26,14 @@ export const GymSchema = z.object({
   updatedAt: DateStringSchema,
 })
 
-export const GymListResponseSchema = z.object({
-  message: z.string(),
-  data: z.array(GymSchema),
-})
+export const GymListResponseSchema = z
+  .object({
+    message: z.string().min(1, 'Message is required'),
+    data: z.array(GymSchema).min(0, 'Data must be an array'),
+    total: z.number().int().min(0, 'Total must be a non-negative integer'),
+    page: z.number().int().min(1, 'Page must be at least 1'),
+    totalPages: z.number().int().min(0, 'Total pages must be a non-negative integer'),
+  })
+  .strict()
 
-export type GymListResponseSchema = z.infer<typeof GymSchema>
+export type GymListResponseSchema = z.infer<typeof GymListResponseSchema>

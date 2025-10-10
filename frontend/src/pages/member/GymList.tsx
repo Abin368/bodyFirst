@@ -1,73 +1,105 @@
 'use client'
 
 import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { gymStore } from '@/store/gymStore'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+
 import LoadingOverlay from '@/components/common/LoadingOverlay'
-
+import { motion } from 'framer-motion'
+import GymCard from '@/components/common/GymCard'
+import useDebounce from '@/hooks/useDebounce'
+import { Search, Dumbbell } from 'lucide-react'
+import Pagination from '@/components/common/Pagination'
 const GymList = observer(() => {
-  useEffect(() => {
-    gymStore.fetchGyms()
-  }, [])
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 300)
+  const [page, setPage] = useState(1)
 
-  if (gymStore.loading) {
-    return <LoadingOverlay />
-  }
+  useEffect(() => {
+    gymStore.setSearch(debouncedSearch)
+  }, [debouncedSearch])
+
+  useEffect(() => {
+    gymStore.setPage(page)
+    gymStore.fetchGyms()
+  }, [page, gymStore.searchTerm])
+
+  if (gymStore.loading) return <LoadingOverlay />
+
+  const gyms = gymStore.gyms || []
+
+  const totalPages = gymStore.totalPages | 1
 
   if (gymStore.error) {
     return (
-      <div className="text-red-500 text-center mt-10">
-        {gymStore.error || 'Failed to load gyms'}
+      <div className="min-h-[400px] flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center shadow-lg">
+            <span className="text-red-600 text-2xl">⚠️</span>
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 mb-2">Unable to Load Gyms</h3>
+          <p className="text-slate-600">{gymStore.error}</p>
+        </div>
       </div>
     )
   }
 
-  if (gymStore.gyms.length === 0) {
-    return <div className="text-center mt-10 text-gray-500">No gyms available at the moment</div>
-  }
-
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {gymStore.gyms.map((gym) => (
-        <Card key={gym._id} className="shadow-md hover:shadow-xl transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold">{gym.name}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-sm text-gray-600">
-              {gym.address.street}, {gym.address.city}, {gym.address.state} - {gym.address.pincode}
-            </p>
-            {gym.contactNo && <p className="text-sm">📞 {gym.contactNo}</p>}
-            {gym.website && (
-              <p className="text-sm">
-                🌐{' '}
-                <a href={gym.website} target="_blank" className="underline text-blue-600">
-                  {gym.website}
-                </a>
-              </p>
-            )}
-            {gym.images && gym.images.length > 0 && (
-              <div className="flex overflow-x-auto space-x-2 mt-2">
-                {gym.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`Gym ${gym.name} image ${idx + 1}`}
-                    className="w-32 h-20 object-cover rounded-md border"
-                  />
-                ))}
-              </div>
-            )}
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="default">Join</Button>
-            <Button variant="outline">Details</Button>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
+    <section className="relative px-4 py-16 md:py-20 bg-gradient-to-br">
+      {/* Header + Search */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center max-w-3xl mx-auto mb-10 px-4"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-xs md:text-sm mb-4 shadow-lg">
+          <Dumbbell className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="tracking-wide uppercase">Find Your Fitness Hub</span>
+        </div>
+        <h2 className="text-3xl md:text-5xl font-light tracking-tight text-slate-900 mb-3">
+          Choose Your{' '}
+          <span className="font-bold bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent">
+            Perfect Gym
+          </span>
+        </h2>
+        <p className="text-base md:text-lg text-slate-600 leading-relaxed">
+          Discover premium gyms with top-tier facilities, expert trainers, and the perfect vibe to
+          push your limits.
+        </p>
+
+        {/* Search Bar */}
+        <div className="mt-8 relative max-w-md mx-auto">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search gyms..."
+            className="w-full pl-12 pr-4 py-3 rounded-full border border-indigo-200 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-400 focus:outline-none shadow-sm transition-all"
+          />
+          <Search className="w-5 h-5 text-indigo-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+      </motion.div>
+
+      {/* Grid of Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {gyms.length === 0 ? (
+          <p className="text-center text-slate-500 col-span-full">
+            {' '}
+            No gyms found matching your search
+          </p>
+        ) : (
+          gyms.map((gym, index) => <GymCard key={gym._id} gym={gym} index={index}></GymCard>)
+        )}
+      </div>
+
+      {/* Pagination */}
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={(newPage) => setPage(newPage)}
+      />
+    </section>
   )
 })
 

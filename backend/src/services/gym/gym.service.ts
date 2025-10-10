@@ -12,11 +12,20 @@ import { IGymRepository } from '../../interfaces/repository/gym/IGymRepository'
 export default class GymService implements IGymService {
   constructor(@inject(TYPES.GymRepository) private readonly _gymRepository: IGymRepository) {}
 
-  async getActiveGyms(): Promise<IOwnerGym[]> {
+  async getActiveGyms(
+    searchTerm = '',
+    page = 1,
+    limit = 12
+  ): Promise<{
+    gyms: IOwnerGym[]
+    totalGyms: number
+    totalPages: number
+    currentPage: number
+  }> {
     try {
-      const gyms = await this._gymRepository.findActiveGyms()
-      logger.info(`[GymService] Fetched active gyms`)
-      return gyms
+      const result = await this._gymRepository.findActiveGymsWithSearch(searchTerm, page, limit)
+      logger.info(`[GymService] Fetched gyms (page: ${page}, search: ${searchTerm})`)
+      return result
     } catch (err) {
       logger.error('[GymService] Failed to fetch active gyms', { error: err })
       throw new AppError(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGES.COMMON.SERVER_ERROR)

@@ -24,4 +24,6 @@ const OwnerGymSchema = new Schema<IOwnerGym>(
   { timestamps: true }
 )
 
+OwnerGymSchema.index({ name: 'text', 'address.city': 'text' })
+
 export default model<IOwnerGym>('OwnerGym', OwnerGymSchema)
